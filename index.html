@@ -16,7 +16,7 @@
        font:15px/1.65 "Pretendard","맑은 고딕",system-ui,sans-serif}
   .wrap{max-width:860px;margin:0 auto;padding:16px 14px 90px}
 
-  header{display:flex;align-items:center;gap:10px;margin:6px 0 14px}
+  header{display:flex;align-items:center;gap:10px;margin:6px 0 14px;flex-wrap:wrap}
   header h1{font-size:20px;margin:0;font-weight:800}
   header .sub{color:var(--dim);font-size:13px}
 
@@ -57,18 +57,51 @@
   .muted{color:var(--dim);font-size:13px}
   .pill{display:inline-block;background:#eef1f5;border-radius:99px;padding:2px 10px;
         font-size:12px;font-weight:700;color:var(--dim)}
+
+  /* ── 이 도구에서 더한 것 ── */
+  table.t{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px;display:block;overflow-x:auto}
+  table.t th,table.t td{border:1px solid var(--line);padding:7px 9px;text-align:left;white-space:nowrap}
+  table.t th{background:#f2f5f9;font-weight:700}
+  table.t td.c,table.t th.c{text-align:center}
+  .fig{display:block;margin:10px auto;max-width:100%;height:auto}
+  .figcap{text-align:center;color:var(--dim);font-size:12.5px;margin-top:-2px}
+  ul.li{margin:6px 0 0;padding-left:20px}
+  ul.li li{margin-bottom:3px}
+  .warnbox{background:#fff8e8;border-left:3px solid var(--warn);border-radius:0 8px 8px 0;
+           padding:9px 13px;margin-top:10px;font-size:14px}
+
+  .gpick{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+  .gcard{border:1px solid var(--line);border-radius:12px;background:var(--card);padding:14px;
+         cursor:pointer;text-align:left}
+  .gcard:hover{border-color:var(--pri)}
+  .gcard b{display:block;font-size:15px;margin-bottom:3px}
+  .gcard span{color:var(--dim);font-size:13px}
+
+  .slider{flex:1 1 180px;min-width:140px;margin:8px 0}
+  .gauge{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--dim);flex-wrap:nowrap}
+  .seq{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .chip{border:1px solid var(--line);background:var(--card);border-radius:999px;
+        padding:8px 13px;font-weight:700;font-size:14px;cursor:pointer}
+  .chip:hover{border-color:var(--pri)}
+  .chip.used{opacity:.35;cursor:default}
+  .chip.bad{border-color:var(--no);background:#fdeeee}
+  .slot{display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-height:42px;
+        border:1px dashed var(--line);border-radius:10px;padding:8px;background:#fbfcfe}
+  .slot .chip{cursor:default}
+  .combo{font-weight:800;color:var(--warn)}
 </style>
 </head>
 <body>
 <div class="wrap">
 
   <header>
-    <h1>용접 마스터</h1>
+    <h1>🔥 용접 마스터</h1>
     <span class="sub" id="hdSub"></span>
   </header>
 
   <div class="tabs">
     <button class="tab on" data-view="learn">📖 배우기</button>
+    <button class="tab"    data-view="game">🎮 게임</button>
     <button class="tab"    data-view="practice">✏️ 연습 8문항</button>
     <button class="tab"    data-view="exam">🏁 종합시험 20문항</button>
     <button class="tab"    data-view="wrong">📕 오답노트</button>
@@ -81,35 +114,658 @@
 /* ══════════════════════════════════════════════════════════════
    용접 마스터
    규약: https://github.com/hongyul67-cpu/links/blob/master/CONVENTIONS.md
-   고칠 곳은 아래 LEARN / QUESTIONS 두 배열뿐입니다.
+
+   내용 출처 (실제로 열어 확인한 것만 씀)
+     · 기계기초공작 Ⅵ. 용접 작업 (01 용접원리 / 02 전기용접 / 03 가스용접)
+       — 2017학년도 교과진도표의 단원 구성을 그대로 따름
+     · 수업용 「용접 원리」·「가스 용접」 강의자료
+     · 한국산업인력공단 훈련교재 『용접일반』(전 11장) · 『가스용접실기』
+       · 『피복아크용접 실기』 · 『특수용접』
+   문항은 전부 자작입니다. 학교 고사 원안은 저작권 표시가 있어 옮기지 않았습니다.
    ══════════════════════════════════════════════════════════════ */
+
+/* ────────────────────────────────────────────────
+   그림 — 외부 이미지는 깨지므로 SVG 를 직접 그립니다
+   ──────────────────────────────────────────────── */
+
+/* 용접될 때 일어나는 현상: 용적·용융지·용입·용착 */
+function figWeldTerms(){ return `
+<svg class="fig" viewBox="0 0 320 190" width="320" role="img" aria-label="용접부 단면 그림">
+  <rect x="10" y="105" width="300" height="70" fill="#c9d1dc" stroke="#8b95a4"/>
+  <path d="M120 105 q40 34 80 0 z" fill="#f0a35e" stroke="#c07a34"/>
+  <path d="M120 105 q40 -22 80 0" fill="#ffd7a8" stroke="#c07a34"/>
+  <rect x="152" y="8" width="12" height="62" fill="#7d8794"/>
+  <rect x="152" y="8" width="12" height="46" fill="#4a5560"/>
+  <circle cx="158" cy="84" r="9" fill="#ff9f43" stroke="#c07a34"/>
+  <line x1="158" y1="70" x2="158" y2="76" stroke="#ff6b00" stroke-width="3"/>
+  <text x="176" y="88" font-size="12" fill="#1c2430">용적</text>
+  <text x="212" y="100" font-size="12" fill="#1c2430">용착</text>
+  <line x1="208" y1="96" x2="186" y2="99" stroke="#6b7684"/>
+  <text x="120" y="152" font-size="12" fill="#1c2430">용입</text>
+  <line x1="140" y1="148" x2="158" y2="132" stroke="#6b7684"/>
+  <text x="26" y="122" font-size="12" fill="#1c2430">용융지</text>
+  <line x1="66" y1="118" x2="132" y2="112" stroke="#6b7684"/>
+  <text x="252" y="30" font-size="12" fill="#6b7684">용접봉</text>
+  <text x="14" y="186" font-size="12" fill="#6b7684">모재</text>
+</svg>
+<div class="figcap">용접부 단면 — 용적 · 용융지 · 용입 · 용착</div>`; }
+
+/* 아크 용접 회로 */
+function figCircuit(){ return `
+<svg class="fig" viewBox="0 0 340 180" width="340" role="img" aria-label="아크 용접 회로 그림">
+  <rect x="12" y="52" width="76" height="62" rx="6" fill="#eef1f5" stroke="#8b95a4"/>
+  <text x="50" y="80" font-size="12" text-anchor="middle" fill="#1c2430">용접기</text>
+  <text x="50" y="97" font-size="11" text-anchor="middle" fill="#6b7684">(전원)</text>
+  <path d="M88 66 H150" stroke="#e5484d" stroke-width="3" fill="none"/>
+  <text x="119" y="59" font-size="11" text-anchor="middle" fill="#e5484d">홀더 케이블</text>
+  <rect x="150" y="56" width="34" height="20" rx="4" fill="#4a5560"/>
+  <text x="167" y="50" font-size="11" text-anchor="middle" fill="#1c2430">홀더</text>
+  <rect x="184" y="63" width="46" height="7" fill="#7d8794"/>
+  <text x="207" y="58" font-size="11" text-anchor="middle" fill="#1c2430">용접봉</text>
+  <path d="M230 70 l10 16 -6 0 8 14" stroke="#f5a524" stroke-width="3" fill="none"/>
+  <text x="256" y="86" font-size="11" fill="#f5a524">아크</text>
+  <rect x="150" y="112" width="176" height="20" fill="#c9d1dc" stroke="#8b95a4"/>
+  <text x="238" y="126" font-size="12" text-anchor="middle" fill="#1c2430">모재</text>
+  <path d="M150 122 H50 V114" stroke="#2563eb" stroke-width="3" fill="none"/>
+  <text x="100" y="146" font-size="11" text-anchor="middle" fill="#2563eb">접지 케이블</text>
+</svg>
+<div class="figcap">전류가 한 바퀴 돌아 제자리로 오는 닫힌 회로입니다</div>`; }
+
+/* 용접 자세 — 게임에서도 그대로 씁니다 (그림이 답을 흘리지 않게 기호는 넣지 않음) */
+function figPos(k){
+  const P='#c9d1dc', PL='#8b95a4', B='#e5484d', T='#2563eb';
+  const torch = (x1,y1,x2,y2,hx,hy,dir)=>{
+    const head = dir==='down' ? `${hx-6},${hy-9} ${hx+6},${hy-9} ${hx},${hy}`
+              : dir==='up'   ? `${hx-6},${hy+9} ${hx+6},${hy+9} ${hx},${hy}`
+              :                `${hx+9},${hy-6} ${hx+9},${hy+6} ${hx},${hy}`;
+    return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${T}" stroke-width="7"
+            stroke-linecap="round"/><polygon points="${head}" fill="${T}"/>`;
+  };
+  let inner='', note='';
+  if(k==='F'){
+    inner = `<rect x="24" y="96" width="172" height="22" fill="${P}" stroke="${PL}"/>
+             <line x1="46" y1="96" x2="174" y2="96" stroke="${B}" stroke-width="7" stroke-linecap="round"/>
+             ${torch(110,26,110,78,110,88,'down')}`;
+    note='모재 : 수평면';
+  } else if(k==='O'){
+    inner = `<rect x="24" y="42" width="172" height="22" fill="${P}" stroke="${PL}"/>
+             <line x1="46" y1="64" x2="174" y2="64" stroke="${B}" stroke-width="7" stroke-linecap="round"/>
+             ${torch(110,134,110,82,110,72,'up')}`;
+    note='모재 : 수평면';
+  } else if(k==='H'){
+    inner = `<rect x="30" y="18" width="128" height="124" fill="${P}" stroke="${PL}"/>
+             <line x1="42" y1="80" x2="146" y2="80" stroke="${B}" stroke-width="7" stroke-linecap="round"/>
+             ${torch(196,80,172,80,162,80,'left')}`;
+    note='모재 : 수직면';
+  } else {
+    inner = `<rect x="30" y="18" width="128" height="124" fill="${P}" stroke="${PL}"/>
+             <line x1="94" y1="30" x2="94" y2="130" stroke="${B}" stroke-width="7" stroke-linecap="round"/>
+             ${torch(196,80,172,80,162,80,'left')}`;
+    note='모재 : 수직면';
+  }
+  return `<svg class="fig" viewBox="0 0 220 160" width="220" role="img" aria-label="용접 자세 그림">
+    ${inner}
+    <text x="8" y="154" font-size="11" fill="#6b7684">${note}</text>
+    <text x="196" y="154" font-size="11" fill="#6b7684" text-anchor="end">↓ 중력</text>
+    <text x="8" y="14" font-size="11" fill="#e5484d">━ 용접선</text>
+  </svg>`;
+}
+
+/* 가스 불꽃 — 배우기와 「불꽃 조절」 게임이 같은 함수를 씁니다 */
+function figFlame(kind, w){
+  w = w || 330;
+  const cfg = {
+    carb : { core:34, feather:1, inner:74, outer:150, oc:'#9aa7d8' },
+    neut : { core:26, feather:0, inner:58, outer:112, oc:'#7f93e0' },
+    oxid : { core:15, feather:0, inner:34, outer:74,  oc:'#6f8cf0' },
+  }[kind];
+  const x0 = 62, cy = 62;
+  const feather = cfg.feather ? `
+    <path d="M${x0} ${cy-17} Q${x0+cfg.inner*0.7} ${cy-24} ${x0+cfg.inner+16} ${cy}
+             Q${x0+cfg.inner*0.7} ${cy+24} ${x0} ${cy+17} Z"
+          fill="#fff4d6" stroke="#e8d49a"/>` : '';
+  return `
+<svg class="fig" viewBox="0 0 400 128" width="${w}" role="img" aria-label="가스 용접 불꽃 그림">
+  <rect x="6" y="${cy-9}" width="46" height="18" rx="3" fill="#7d8794"/>
+  <rect x="44" y="${cy-6}" width="18" height="12" rx="2" fill="#4a5560"/>
+  <path d="M${x0} ${cy-30} Q${x0+cfg.outer*0.55} ${cy-40} ${x0+cfg.outer} ${cy}
+           Q${x0+cfg.outer*0.55} ${cy+40} ${x0} ${cy+30} Z"
+        fill="${cfg.oc}" opacity=".45"/>
+  ${feather}
+  <path d="M${x0} ${cy-19} Q${x0+cfg.inner*0.6} ${cy-25} ${x0+cfg.inner} ${cy}
+           Q${x0+cfg.inner*0.6} ${cy+25} ${x0} ${cy+19} Z"
+        fill="#4f74d8" opacity=".75"/>
+  <path d="M${x0} ${cy-11} Q${x0+cfg.core*0.6} ${cy-14} ${x0+cfg.core} ${cy}
+           Q${x0+cfg.core*0.6} ${cy+14} ${x0} ${cy+11} Z"
+        fill="#ffffff" stroke="#dfe6f2"/>
+  <text x="30" y="${cy+30}" font-size="11" fill="#6b7684">팁</text>
+</svg>`; }
+
+/* 불꽃 각 부분의 이름표 (배우기 전용 — 게임에서는 쓰지 않습니다) */
+function figFlameLabel(){ return `
+<svg class="fig" viewBox="0 0 400 150" width="360" role="img" aria-label="불꽃의 구성">
+  <rect x="6" y="61" width="46" height="18" rx="3" fill="#7d8794"/>
+  <rect x="44" y="64" width="18" height="12" rx="2" fill="#4a5560"/>
+  <path d="M62 40 Q124 30 174 70 Q124 110 62 100 Z" fill="#7f93e0" opacity=".45"/>
+  <path d="M62 51 Q97 45 120 70 Q97 95 62 89 Z" fill="#4f74d8" opacity=".75"/>
+  <path d="M62 59 Q78 56 88 70 Q78 84 62 81 Z" fill="#fff" stroke="#dfe6f2"/>
+  <line x1="80" y1="60" x2="96" y2="26" stroke="#6b7684"/>
+  <text x="72" y="20" font-size="12" fill="#1c2430">불꽃심(백심)</text>
+  <line x1="112" y1="62" x2="150" y2="34" stroke="#6b7684"/>
+  <text x="152" y="30" font-size="12" fill="#1c2430">속불꽃</text>
+  <line x1="164" y1="80" x2="206" y2="104" stroke="#6b7684"/>
+  <text x="208" y="108" font-size="12" fill="#1c2430">겉불꽃</text>
+  <text x="150" y="132" font-size="12" fill="#6b7684">백심 끝에서 2~3㎜ 앞이 용접하는 자리</text>
+</svg>`; }
+
+/* 산소·아세틸렌 용기 */
+function figCylinders(){ return `
+<svg class="fig" viewBox="0 0 320 180" width="300" role="img" aria-label="산소와 아세틸렌 용기">
+  <rect x="34" y="42" width="60" height="118" rx="26" fill="#12a150" stroke="#0b7a3c"/>
+  <rect x="56" y="26" width="16" height="20" fill="#7d8794"/>
+  <text x="64" y="104" font-size="14" fill="#fff" text-anchor="middle" font-weight="bold">산소</text>
+  <text x="64" y="176" font-size="12" fill="#1c2430" text-anchor="middle">녹색 용기</text>
+  <rect x="226" y="42" width="60" height="118" rx="26" fill="#f5c542" stroke="#c79a12"/>
+  <rect x="248" y="26" width="16" height="20" fill="#7d8794"/>
+  <text x="256" y="98" font-size="13" fill="#1c2430" text-anchor="middle" font-weight="bold">아세</text>
+  <text x="256" y="114" font-size="13" fill="#1c2430" text-anchor="middle" font-weight="bold">틸렌</text>
+  <text x="256" y="176" font-size="12" fill="#1c2430" text-anchor="middle">노란 용기</text>
+  <path d="M94 92 Q150 92 150 116 H170" stroke="#12a150" stroke-width="5" fill="none"/>
+  <text x="128" y="86" font-size="11" fill="#12a150">녹색 호스</text>
+  <path d="M226 92 Q170 92 170 128 H150" stroke="#e5484d" stroke-width="5" fill="none"/>
+  <text x="196" y="86" font-size="11" fill="#e5484d">빨간 호스</text>
+  <rect x="140" y="108" width="44" height="26" rx="5" fill="#4a5560"/>
+  <text x="162" y="126" font-size="11" fill="#fff" text-anchor="middle">토치</text>
+</svg>`; }
+
 
 /* ── 1) 배우기 — 정답을 다 보여 주는 단계. 테스트보다 반드시 앞에 ── */
 const LEARN = [
-  { unit:'1단원', t:'첫 번째 개념', body:
-    '교과서 표현을 그대로 쓰고, 필요하면 짧은 보충만 덧붙입니다. ' +
-    '핵심어는 <span class="kw">이렇게</span> 강조합니다.' },
-  { unit:'1단원', t:'두 번째 개념', body:
-    '그림이 필요하면 <b>SVG 를 직접 그려</b> 넣습니다(외부 이미지 링크는 깨집니다).' },
+
+/* ═══ 1단원 용접 원리 ═══ */
+{ unit:'1단원 용접 원리', t:'용접이란 무엇인가', body:
+  '두 개 이상의 금속 재료를 <span class="kw">용융</span> 또는 <span class="kw">반용융</span> 상태에서 ' +
+  '<span class="kw">용가재(용접봉)</span>를 첨가하여 접합하거나, 접합하고자 하는 부분을 적당한 온도로 ' +
+  '가열한 후 압력을 가하여 서로 접합시키는 기술입니다.' +
+  '<div class="explain">쇠를 <b>녹여서 붙인다</b>는 것이 핵심입니다. 볼트로 죄거나(체결) ' +
+  '리벳으로 박는 것과 달리, 붙인 자리가 원래 한 덩어리였던 것처럼 이어집니다.</div>' },
+
+{ unit:'1단원 용접 원리', t:'용접의 장점', body:
+  '<ul class="li">' +
+  '<li>재료의 <span class="kw">두께에 제한이 없다</span></li>' +
+  '<li><span class="kw">기밀·수밀·유밀성</span>이 우수하며 이음 효율이 높다</li>' +
+  '<li>작업 공정이 단축되어 재료가 절약되고 경제적이다</li>' +
+  '<li>제품의 성능과 수명이 향상되며 <span class="kw">이종 재료</span>도 접합할 수 있다</li>' +
+  '<li>보수와 수리가 용이하다</li>' +
+  '<li>용접 준비 및 작업이 비교적 간단하고 자동화가 용이하다</li>' +
+  '<li>소음이 적어 실내 작업이 가능하며 복잡한 구조물 제작이 쉽다</li></ul>' },
+
+{ unit:'1단원 용접 원리', t:'용접의 단점', body:
+  '<ul class="li">' +
+  '<li><span class="kw">저온 취성</span>이 생길 우려가 있다</li>' +
+  '<li>품질 검사가 곤란하고 <span class="kw">변형과 수축</span>이 생긴다</li>' +
+  '<li>재질의 변형 및 <span class="kw">잔류 응력</span>이 발생한다</li>' +
+  '<li>작업자의 기술에 따라 용접부의 품질이 좌우된다</li></ul>' +
+  '<div class="explain">장점과 단점을 한 쌍으로 외우면 헷갈리지 않습니다. ' +
+  '「재료가 절약된다」는 장점, 「변형과 수축이 생긴다」는 단점입니다.</div>' },
+
+{ unit:'1단원 용접 원리', t:'용접될 때 일어나는 일 — 용적·용융지·용입·용착', body:
+  figWeldTerms() +
+  '<table class="t"><tr><th>용어</th><th>뜻</th></tr>' +
+  '<tr><td>용적</td><td>용접봉이 녹아 모재로 옮겨 가는 쇳물 <b>방울</b></td></tr>' +
+  '<tr><td>용융지</td><td>아크열로 모재가 녹아 쇳물이 <b>고인 곳</b></td></tr>' +
+  '<tr><td>용입</td><td>아크열에 의하여 모재가 <b>녹아 들어간 깊이</b></td></tr>' +
+  '<tr><td>용착</td><td>녹은 금속이 굳어 <b>모재에 붙은 것</b></td></tr>' +
+  '<tr><td>비드</td><td>용착으로 생긴 <b>줄 모양의 자국</b></td></tr></table>' +
+  '<div class="explain">네 낱말이 헷갈리는 이유는 모두 「녹는 것」을 가리키기 때문입니다. ' +
+  '<b>방울(용적) → 웅덩이(용융지) → 깊이(용입) → 붙음(용착)</b> 순서로 기억하세요.</div>' },
+
+/* ═══ 2단원 전기용접 ═══ */
+{ unit:'2단원 전기용접', t:'아크 용접의 회로', body:
+  '용접봉 끝과 모재 사이에 <span class="kw">아크</span>를 일으켜, 그 열(약 5,000℃ 이상)로 ' +
+  '모재와 용접봉을 함께 녹여 붙이는 방법입니다. 전류는 아래처럼 <b>한 바퀴 돌아 제자리로</b> 옵니다.' +
+  figCircuit() +
+  '<div class="explain">용접기 → 홀더 케이블 → 홀더 → 용접봉 → 아크 → 모재 → 접지 케이블 → 용접기<br>' +
+  '<b>케이블이 먼저, 홀더가 나중</b>입니다. 케이블이 홀더까지 전기를 날라다 주기 때문입니다.</div>' },
+
+{ unit:'2단원 전기용접', t:'용접기에 딸린 기구', body:
+  '<table class="t"><tr><th>기구</th><th>하는 일</th></tr>' +
+  '<tr><td>홀더</td><td>용접봉을 물어 잡고 전류를 보낸다</td></tr>' +
+  '<tr><td>홀더 케이블</td><td>용접기와 홀더를 잇는 2차 케이블</td></tr>' +
+  '<tr><td>접지 클램프</td><td>모재에 물려 전류가 용접기로 돌아가게 한다</td></tr>' +
+  '<tr><td>헬멧 · 핸드 실드</td><td>아크 광선·스패터로부터 눈과 얼굴을 보호</td></tr>' +
+  '<tr><td>차광 유리</td><td>자외선·적외선을 막는다. 번호가 클수록 많이 막는다</td></tr>' +
+  '<tr><td>치핑 해머</td><td>굳은 슬래그를 두들겨 떼어 낸다</td></tr>' +
+  '<tr><td>와이어 브러시</td><td>비드 표면의 스케일·슬래그를 솔질해 없앤다</td></tr></table>' +
+  '<div class="warnbox">접지 클램프를 헐겁게 물리면 아크가 불안정해지고 열이 나 위험합니다.</div>' },
+
+{ unit:'2단원 전기용접', t:'극성 — 정극성과 역극성', body:
+  '직류 용접기는 어느 쪽을 (+)에 잇느냐에 따라 성질이 달라집니다.' +
+  '<table class="t"><tr><th></th><th class="c">직류 정극성</th><th class="c">직류 역극성</th></tr>' +
+  '<tr><td>모재</td><td class="c">(+)</td><td class="c">(−)</td></tr>' +
+  '<tr><td>용접봉</td><td class="c">(−)</td><td class="c">(+)</td></tr>' +
+  '<tr><td>열이 많이 나는 쪽</td><td class="c">모재</td><td class="c">용접봉</td></tr>' +
+  '<tr><td>용입 깊이</td><td class="c">깊다</td><td class="c">얕다</td></tr>' +
+  '<tr><td>알맞은 곳</td><td class="c">두꺼운 판</td><td class="c">얇은 판</td></tr></table>' +
+  '<div class="explain"><b>정</b>극성은 모재가 <b>(+)</b> — 「정」과 「+」를 짝지어 외우면 나머지는 반대로 따라옵니다. ' +
+  '모재 쪽에 열이 몰리니 깊이 파이고(용입 깊음), 그래서 두꺼운 판에 씁니다.</div>' },
+
+{ unit:'2단원 전기용접', t:'용접봉의 기호 읽기 — E 43 △△', body:
+  '연강용 피복 아크 용접봉은 <span class="kw">KS D 7004</span> 에 규정되어 있습니다.' +
+  '<table class="t"><tr><th class="c">E</th><th class="c">43</th><th class="c">△△</th></tr>' +
+  '<tr><td class="c">피복 아크 용접봉</td><td class="c">용착 금속의<br>최소 인장 강도</td>' +
+  '<td class="c">피복제의 계통</td></tr></table>' +
+  '<div class="explain">43 은 <b>43kgf/mm²</b> 수준을 뜻합니다. 같은 봉을 미국에서는 ' +
+  '야드·파운드법을 써서 60,000 lbs/in² → <b>E60△△</b> 로 적습니다. 숫자만 다르고 같은 봉입니다.</div>' },
+
+{ unit:'2단원 전기용접', t:'연강용 피복 아크 용접봉의 종류 (KS D 7004)', body:
+  '<table class="t"><tr><th>종류</th><th>피복제 계통</th><th>용접 자세</th></tr>' +
+  '<tr><td>E 4301</td><td>일미나이트계</td><td>F, V, O, H</td></tr>' +
+  '<tr><td>E 4303</td><td>라임티타니아계</td><td>F, V, O, H</td></tr>' +
+  '<tr><td>E 4311</td><td>고셀룰로오스계</td><td>F, V, O, H</td></tr>' +
+  '<tr><td>E 4313</td><td>고산화티탄계</td><td>F, V, O, H</td></tr>' +
+  '<tr><td>E 4316</td><td>저수소계</td><td>F, V, O, H</td></tr>' +
+  '<tr><td>E 4324</td><td>철분산화티탄계</td><td>F, H</td></tr>' +
+  '<tr><td>E 4326</td><td>철분저수소계</td><td>F, H</td></tr>' +
+  '<tr><td>E 4327</td><td>철분산화철계</td><td>F, H</td></tr>' +
+  '<tr><td>E 4340</td><td>특수계</td><td>F, V, O, H 또는 어느 자세</td></tr></table>' +
+  '<div class="explain">「<b>철분</b>」이 붙은 세 가지(4324·4326·4327)는 <b>F, H 두 자세뿐</b>입니다. ' +
+  '철분이 들어가 무거워서 위보기·수직에서는 쇳물이 흘러내리기 때문입니다.</div>' },
+
+{ unit:'2단원 전기용접', t:'피복제는 왜 바르는가', body:
+  '심선에 발라 놓은 피복제는 아크열에 타면서 여러 일을 한꺼번에 합니다.' +
+  '<table class="t"><tr><th>성분</th><th>하는 일</th><th>보기</th></tr>' +
+  '<tr><td>아크 안정제</td><td>이온화하여 아크를 안정시킨다</td><td>산화티탄, 규산나트륨, 석회석</td></tr>' +
+  '<tr><td>가스 발생제</td><td>가스를 내어 용융 금속을 공기로부터 지킨다</td><td>녹말, 톱밥, 셀룰로오스</td></tr>' +
+  '<tr><td>슬래그 생성제</td><td>슬래그를 덮어 <b>급랭을 막는다</b></td><td>—</td></tr>' +
+  '<tr><td>탈산제</td><td>산소를 빼앗아 정련한다</td><td>—</td></tr>' +
+  '<tr><td>고착제</td><td>피복 배합제를 심선에 붙여 둔다</td><td>—</td></tr>' +
+  '<tr><td>합금제</td><td>용접 금속의 성질을 좋게 한다</td><td>Mn, Si, Ni, Mo, Cr, Cu</td></tr></table>' +
+  '<div class="warnbox">슬래그는 <b>천천히 식게 덮어 주는 이불</b>입니다. ' +
+  '「슬래그가 급랭시킨다」는 설명은 정반대라 틀린 말입니다.</div>' },
+
+{ unit:'2단원 전기용접', t:'용접 자세 네 가지', body:
+  '<div class="row" style="justify-content:center;gap:0">' + figPos('F') + figPos('H') + '</div>' +
+  '<div class="figcap">왼쪽 : 아래보기(F) &nbsp;·&nbsp; 오른쪽 : 수평(H)</div>' +
+  '<div class="row" style="justify-content:center;gap:0">' + figPos('V') + figPos('O') + '</div>' +
+  '<div class="figcap">왼쪽 : 수직(V) &nbsp;·&nbsp; 오른쪽 : 위보기(O)</div>' +
+  '<table class="t"><tr><th class="c">기호</th><th>이름</th><th>어떤 자세인가</th></tr>' +
+  '<tr><td class="c">F</td><td>아래보기</td><td>모재가 수평이고 위에서 내려다보며 한다 (flat)</td></tr>' +
+  '<tr><td class="c">H</td><td>수평</td><td>수직면에서 용접선이 <b>옆으로</b> 간다 (horizontal)</td></tr>' +
+  '<tr><td class="c">V</td><td>수직</td><td>수직면에서 용접선이 <b>위아래로</b> 간다 (vertical)</td></tr>' +
+  '<tr><td class="c">O</td><td>위보기</td><td>모재 <b>아래</b>에서 올려다보며 한다 (overhead)</td></tr></table>' +
+  '<div class="explain">F 가 가장 쉽고 O 가 가장 어렵습니다. 쇳물이 중력을 거슬러야 하기 때문입니다. ' +
+  '그래서 실습은 언제나 아래보기부터 시작합니다.</div>' },
+
+{ unit:'2단원 전기용접', t:'아크 쏠림(자기 불림)', body:
+  '용접봉에 아크가 <b>한쪽으로 쏠리는</b> 현상입니다. 전류가 만드는 자기장이 용접부에 대해 ' +
+  '비대칭으로 생겨서 일어나며, <span class="kw">자기 불림</span>이라고도 합니다. ' +
+  '전류 방향이 계속 바뀌는 <b>교류에서는 생기지 않습니다.</b>' +
+  '<ul class="li"><li>직류 대신 <b>교류</b>로 용접한다</li>' +
+  '<li>큰 가접부나 이미 끝난 용착부를 향하여 용접한다</li>' +
+  '<li>용접부가 길면 후퇴 용접법으로 한다</li>' +
+  '<li>접지점을 될 수 있는 대로 용접부에서 <b>멀리</b> 한다</li>' +
+  '<li><b>짧은 아크</b>를 쓴다</li>' +
+  '<li>용접봉 끝을 쏠리는 반대 방향으로 기울인다</li>' +
+  '<li>받침쇠·긴 가접부·엔드 탭을 이용한다</li>' +
+  '<li>접지점 두 개를 연결한다</li></ul>' },
+
+{ unit:'2단원 전기용접', t:'용접 결함 — 눈으로 찾는 것들', body:
+  '<table class="t"><tr><th>결함</th><th>어떤 모습인가</th></tr>' +
+  '<tr><td>언더컷</td><td>비드 가장자리의 모재가 <b>파여 홈</b>이 생긴 것</td></tr>' +
+  '<tr><td>오버랩</td><td>녹은 금속이 모재에 붙지 못하고 <b>덮어씌워진</b> 것</td></tr>' +
+  '<tr><td>용입 불량</td><td>충분히 파고들지 못해 속이 <b>붙지 않은</b> 것</td></tr>' +
+  '<tr><td>크레이터</td><td>아크를 끊은 자리가 <b>오목하게 파인</b> 것</td></tr>' +
+  '<tr><td>스패터</td><td>사방으로 튄 <b>쇳물 알갱이</b></td></tr></table>' +
+  '<div class="explain"><b>크레이터 처리</b> — 아크를 중단한 자리에는 불순물과 편석이 남고 냉각 중에 ' +
+  '균열이 생길 수 있습니다. 그래서 비드 끝에서 아크를 끊었다가 짧게 다시 일으키기를 ' +
+  '두세 번 반복해 오목한 곳을 <b>메워 줍니다</b>.</div>' },
+
+/* ═══ 3단원 가스용접 ═══ */
+{ unit:'3단원 가스용접', t:'산소와 아세틸렌', body:
+  figCylinders() +
+  '<table class="t"><tr><th></th><th class="c">산소</th><th class="c">아세틸렌</th></tr>' +
+  '<tr><td>성질</td><td class="c">조연성 가스<br>(스스로 타지 않고 타는 것을 돕는다)</td>' +
+  '<td class="c">가연성 가스<br>(스스로 잘 탄다)</td></tr>' +
+  '<tr><td>충전 압력</td><td class="c">150 kgf/cm²</td><td class="c">15.5 kgf/cm²</td></tr>' +
+  '<tr><td>용기 색</td><td class="c">녹색</td><td class="c">노란색</td></tr>' +
+  '<tr><td>호스 색</td><td class="c">녹색</td><td class="c">빨간색</td></tr>' +
+  '<tr><td>공기와 견주면</td><td class="c">무겁다</td><td class="c">가볍다</td></tr></table>' +
+  '<div class="explain">아세틸렌은 원래 <b>무색무취</b>라 새어도 알 수 없습니다. ' +
+  '그래서 <b>양파 썩는 냄새</b>를 일부러 넣어 둡니다. 이 냄새가 나면 곧바로 밸브를 잠급니다.</div>' },
+
+{ unit:'3단원 가스용접', t:'가스 용접 장치', body:
+  '<table class="t"><tr><th>부품</th><th>하는 일</th></tr>' +
+  '<tr><td>압력 조정기</td><td>용기의 높은 압력을 작업에 쓸 압력으로 <b>낮춰 준다</b></td></tr>' +
+  '<tr><td>토치</td><td>산소와 아세틸렌을 <b>섞어</b> 내보낸다</td></tr>' +
+  '<tr><td>팁</td><td>토치 끝에 끼우는 노즐. 모재 두께에 맞춰 번호를 고른다</td></tr>' +
+  '<tr><td>호스</td><td>산소는 녹색, 아세틸렌은 빨간색</td></tr>' +
+  '<tr><td>안전기</td><td>불꽃이 거꾸로 타 들어오는 것을 막는다</td></tr></table>' +
+  '<div class="explain">사용 압력의 보기 — 산소 2~5kgf/cm², 아세틸렌 0.2~0.5kgf/cm² 정도로 맞춥니다. ' +
+  '아세틸렌 쪽이 훨씬 낮다는 점을 기억하세요.</div>' },
+
+{ unit:'3단원 가스용접', t:'불꽃의 구성', body:
+  figFlameLabel() +
+  '<table class="t"><tr><th>부분</th><th>성질</th></tr>' +
+  '<tr><td>불꽃심(백심)</td><td>가장 밝고 흰 부분</td></tr>' +
+  '<tr><td>속불꽃</td><td>온도가 가장 높으며 <b>환원성</b>을 띤다</td></tr>' +
+  '<tr><td>겉불꽃</td><td>온도가 비교적 낮으며 금속을 <b>산화</b>시킨다</td></tr></table>' +
+  '<div class="explain">그래서 용접은 <b>백심 끝에서 2~3㎜ 앞</b>, 즉 속불꽃 자리에서 합니다. ' +
+  '백심이 쇳물에 닿으면 금속에 화학적 영향을 주므로 닿지 않게 합니다.</div>' },
+
+{ unit:'3단원 가스용접', t:'불꽃의 종류 — 산소를 얼마나 주느냐', body:
+  '<div style="text-align:center">' + figFlame('carb', 300) + '</div>' +
+  '<div class="figcap"><b>탄화 불꽃</b> — 아세틸렌 과잉. 백심과 겉불꽃 사이에 흰 <b>아세틸렌 페더</b>(제3불꽃)가 보인다</div>' +
+  '<div style="text-align:center">' + figFlame('neut', 300) + '</div>' +
+  '<div class="figcap"><b>중성 불꽃</b> — 산소와 아세틸렌이 1 : 1 정도. 표준으로 쓰는 불꽃</div>' +
+  '<div style="text-align:center">' + figFlame('oxid', 300) + '</div>' +
+  '<div class="figcap"><b>산화 불꽃</b> — 산소 과잉. 백심이 짧고 뾰족하며 용착 금속을 산화시킨다</div>' +
+  '<div class="explain">산소를 조금씩 더 열면 <b>탄화 → 중성 → 산화</b> 순으로 바뀌고, ' +
+  '불꽃은 점점 <b>짧고 뾰족해집니다.</b> 보통 용접은 중성 불꽃으로 합니다.</div>' },
+
+{ unit:'3단원 가스용접', t:'역류 · 역화 · 인화', body:
+  '<table class="t"><tr><th></th><th>역류</th><th>역화</th><th>인화</th></tr>' +
+  '<tr><td>어떤 일인가</td>' +
+  '<td>팁이 막히거나 흐름이 원활하지 못할 때 고압의 <b>산소가 아세틸렌 호스 쪽으로</b> 흘러드는 것</td>' +
+  '<td>토치를 잘못 취급하여 불꽃이 순간적으로 <b>「펑펑」 소리</b>를 내는 현상</td>' +
+  '<td>팁 끝이 갑자기 막혀 불꽃이 <b>토치의 혼합실까지</b> 밀려 들어가는 현상</td></tr>' +
+  '<tr><td>원인</td><td>토치 내부 청소 불량</td><td>토치를 잘못 취급함</td>' +
+  '<td>팁 끝의 막힘 · 과열 · 팁 죔 불량</td></tr></table>' +
+  '<div class="warnbox"><b>역류가 일어나면 — 산소와 아세틸렌 밸브를 차례로 잠급니다.</b><br>' +
+  '세 가지 모두, 먼저 <b>밸브를 잠가 불을 끄는 것</b>이 첫 조치입니다. ' +
+  '불이 붙은 채로 팁을 만지거나, 「괜찮겠지」 하고 작업을 이어 가면 안 됩니다. ' +
+  '작업 전에 팁을 깨끗이 청소해 두면 셋 다 크게 줄어듭니다.</div>' },
+
+{ unit:'3단원 가스용접', t:'용접용 가스가 갖추어야 할 성질', body:
+  '<ul class="li">' +
+  '<li>발열량이 <b>클</b> 것</li>' +
+  '<li>연소 속도가 <b>빠를</b> 것</li>' +
+  '<li>불꽃의 온도가 <b>높을</b> 것</li>' +
+  '<li>용융 금속과 화학 반응을 <b>일으키지 않을</b> 것</li>' +
+  '<li>취급이 쉽고 안전할 것</li></ul>' +
+  '<div class="explain">모두 「잘 녹이되 쇠를 망치지 않는다」는 한 가지로 모입니다. ' +
+  '보기에서 <b>작을·느릴·낮을</b> 같은 말이 나오면 대개 틀린 설명입니다.</div>' },
+
+/* ═══ 4단원 용접 안전 ═══ */
+{ unit:'4단원 용접 안전', t:'감전 재해', body:
+  '<ul class="li"><li>홀더 파손 유무, 전선 피복 손상 유무를 확인한다</li>' +
+  '<li>성능 검사에 합격한 <span class="kw">자동 전격 방지 장치</span>를 부착한다</li>' +
+  '<li>교류 아크 용접기의 접지 상태를 확인한다</li></ul>' +
+  '<div class="explain"><b>전격 방지 장치</b> — 용접을 하지 않는 동안에는 보조 변압기가 ' +
+  '용접기 전압을 <b>20~30V 이하</b>로 낮춰 둡니다. 쉬는 사이에 홀더를 만졌다가 감전되는 사고를 막습니다.</div>' },
+
+{ unit:'4단원 용접 안전', t:'아크 광선 재해와 차광 유리', body:
+  '아크에서는 <span class="kw">자외선</span>과 <span class="kw">적외선</span>이 나옵니다. ' +
+  '맨눈으로 보면 몇 시간 뒤 눈이 붓고 몹시 아픈 <b>전광성 안염</b>이 옵니다. ' +
+  '차광 유리는 번호가 클수록 빛을 많이 막습니다.' +
+  '<table class="t"><tr><th>작업</th><th class="c">차광도 번호</th></tr>' +
+  '<tr><td>납땜</td><td class="c">2~4</td></tr>' +
+  '<tr><td>가스 용접</td><td class="c">4~6</td></tr>' +
+  '<tr><td>피복 아크 용접</td><td class="c">10~12</td></tr></table>' +
+  '<div class="warnbox">옆 사람이 아크를 켤 때도 눈을 돌리거나 가려야 합니다. ' +
+  '내가 용접하지 않아도 광선은 똑같이 들어옵니다.</div>' },
+
+{ unit:'4단원 용접 안전', t:'가스 중독 · 화재 · 폭발', body:
+  '<ul class="li"><li>불꽃으로 손상될 우려가 있는 <b>고무호스를 점검</b>한다</li>' +
+  '<li>가스 누출에 대한 안전 검사 체계를 갖춘다</li>' +
+  '<li>좁은 내부 공간에는 <b>환기구</b>를 준비한다</li>' +
+  '<li>주변의 인화성 물질을 미리 치운다</li></ul>' +
+  '<div class="warnbox">용접 작업에서 흔한 재해는 <b>감전 · 화상 · 화재 · 폭발 · 가스 중독</b>입니다. ' +
+  '용접 연기를 오래 마시면 몸에 해로우므로 환기가 안 되는 곳에서는 작업하지 않습니다.</div>' },
+
+{ unit:'4단원 용접 안전', t:'화상 — 보호구를 갖춰 입기', body:
+  '스패터는 튀는 순간 수백 도입니다. 작업복 위로 튀면 옷을 태우고 살에 박힙니다.' +
+  '<ul class="li"><li>가죽 장갑 · 앞치마 · 팔덮개 · 발커버를 갖춰 착용한다</li>' +
+  '<li>바지 자락을 신발 <b>밖으로</b> 내려 덮는다 — 넣으면 스패터가 신발로 들어간다</li>' +
+  '<li>용접이 끝난 모재는 <b>겉보기로 식었는지 알 수 없다.</b> 반드시 집게로 잡는다</li>' +
+  '<li>가열된 용접봉 끝이 늘 안전한 방향을 향하게 한다</li></ul>' },
 ];
+
 
 /* ── 2) 문항 — a 는 정답 보기의 번호(0부터) ──
-      ⚠ 발문·보기·해설 어디에도 정답을 흘리지 말 것.
-        캡션("절단선을 보고 고르시오")이 답을 알려 주는 사고가 실제로 있었습니다. */
+      ⚠ 발문·보기·해설 어디에도 정답을 흘리지 않도록 하나씩 확인했습니다.
+        문항은 전부 자작입니다. */
 const QUESTIONS = [
-  { unit:'1단원',
-    q:'여기에 발문을 씁니다. 한 값만 가리키도록 씁니다.',
-    ch:['보기 1','보기 2','보기 3','보기 4'],
-    a:1,
-    ex:'왜 그 답인지 — 학생이 혼자 읽고 이해할 만큼.' },
-  { unit:'1단원',
-    q:'두 번째 문항.',
-    ch:['보기 1','보기 2','보기 3','보기 4'],
-    a:0,
-    ex:'해설.' },
+
+/* 1단원 */
+{ unit:'1단원 용접 원리',
+  q:'두 개 이상의 금속을 녹이거나 반쯤 녹인 상태에서 용가재를 넣어 하나로 잇는 가공법은?',
+  ch:['용접','주조','단조','절삭','압연'], a:0,
+  ex:'용접은 용융 또는 반용융 상태에서 용가재(용접봉)를 첨가해 접합하거나, 가열한 뒤 압력을 가해 접합하는 기술입니다.' },
+
+{ unit:'1단원 용접 원리',
+  q:'다음 중 용접의 단점에 해당하는 것은?',
+  ch:['재료가 절약된다','이음 효율이 높다','잔류 응력이 발생한다','소음이 적다','이종 재료를 접합할 수 있다'], a:2,
+  ex:'용접은 열을 쓰기 때문에 재질이 변하고 잔류 응력이 남습니다. 변형·수축, 저온 취성, 품질 검사의 어려움도 함께 단점으로 듭니다.' },
+
+{ unit:'1단원 용접 원리',
+  q:'아크열에 의하여 모재가 녹아 들어간 깊이를 가리키는 용어는?',
+  ch:['용착','용입','용적','용융지','스패터'], a:1,
+  ex:'깊이를 가리키는 말은 용입입니다. 용착은 녹은 금속이 굳어 모재에 붙은 것을 말합니다.' },
+
+{ unit:'1단원 용접 원리',
+  q:'용접봉이 녹아 모재로 옮겨 가는 쇳물 방울을 무엇이라 하는가?',
+  ch:['용적','용융지','용입','비드','슬래그'], a:0,
+  ex:'방울 하나하나가 용적입니다. 그 방울이 떨어져 고인 웅덩이가 용융지입니다.' },
+
+{ unit:'1단원 용접 원리',
+  q:'아크열로 모재가 녹아 쇳물이 고여 있는 부분을 무엇이라 하는가?',
+  ch:['용입','용융지','크레이터','언더컷','비드'], a:1,
+  ex:'녹은 쇳물이 고인 웅덩이가 용융지입니다. 크레이터는 아크를 끊은 자리가 오목하게 파인 결함입니다.' },
+
+/* 2단원 */
+{ unit:'2단원 전기용접',
+  q:'피복 아크 용접에서 용접봉을 물어 잡아 전류를 보내 주는 기구는?',
+  ch:['홀더','접지 클램프','압력 조정기','치핑 해머','와이어 브러시'], a:0,
+  ex:'홀더가 용접봉을 물어 잡습니다. 접지 클램프는 반대쪽에서 모재에 물려 전류가 용접기로 돌아가게 합니다.' },
+
+{ unit:'2단원 전기용접',
+  q:'아크 용접 회로에서 모재 쪽에 물려 전류가 용접기로 되돌아가게 하는 기구는?',
+  ch:['홀더','접지 클램프','팁','안전기','차광 유리'], a:1,
+  ex:'전류는 용접기 → 홀더 케이블 → 홀더 → 용접봉 → 아크 → 모재 → 접지 케이블 → 용접기로 한 바퀴 돕니다. 돌아오는 길을 잡아 주는 것이 접지 클램프입니다.' },
+
+{ unit:'2단원 전기용접',
+  q:'아크 용접 회로에서 용접기를 나온 전류가 홀더에 닿기 바로 전에 지나는 것은?',
+  ch:['모재','접지 케이블','홀더 케이블','용접봉','아크'], a:2,
+  ex:'케이블이 전기를 홀더까지 날라다 줍니다. 그래서 케이블이 먼저이고 홀더가 나중입니다.' },
+
+{ unit:'2단원 전기용접',
+  q:'직류 아크 용접에서 모재를 (+)에, 용접봉을 (−)에 연결한 극성은?',
+  ch:['직류 정극성','직류 역극성','교류','무극성','혼합 극성'], a:0,
+  ex:'모재가 (+)이면 정극성입니다. 열이 모재 쪽에 많이 나서 용입이 깊어지므로 두꺼운 판에 씁니다.' },
+
+{ unit:'2단원 전기용접',
+  q:'얇은 판을 용접할 때 용입이 얕아 알맞은 극성은?',
+  ch:['직류 정극성','직류 역극성','저항 용접','압접','납땜'], a:1,
+  ex:'역극성은 모재가 (−), 용접봉이 (+)입니다. 열이 용접봉 쪽에 많이 나서 모재는 얕게 녹으므로 얇은 판에 알맞습니다.' },
+
+{ unit:'2단원 전기용접',
+  q:'피복 아크 용접봉 E 4316 에서 43 이 뜻하는 것은?',
+  ch:['용착 금속의 최소 인장 강도','용접봉의 지름','용접 자세','사용 전류의 세기','피복제의 두께'], a:0,
+  ex:'43 은 용착 금속의 최소 인장 강도 수준(43kgf/mm²)을 뜻합니다. 같은 봉을 미국에서는 E60△△ 로 적습니다.' },
+
+{ unit:'2단원 전기용접',
+  q:'용접봉 기호 E 4316 에서 맨 앞의 E 가 뜻하는 것은?',
+  ch:['피복 아크 용접봉','전기 저항','연신율','전류의 종류','유효 길이'], a:0,
+  ex:'E 는 그 봉이 피복 아크 용접봉임을 나타냅니다. 뒤의 두 자리(16)는 피복제의 계통을 나타냅니다.' },
+
+{ unit:'2단원 전기용접',
+  q:'KS D 7004 에서 저수소계 용접봉의 종류 기호는?',
+  ch:['E 4301','E 4303','E 4313','E 4316','E 4327'], a:3,
+  ex:'E 4316 이 저수소계입니다. E 4301 은 일미나이트계, E 4303 은 라임티타니아계, E 4313 은 고산화티탄계입니다.' },
+
+{ unit:'2단원 전기용접',
+  q:'다음 용접봉 가운데 쓸 수 있는 자세가 F, H 두 가지뿐인 것은?',
+  ch:['E 4301','E 4303','E 4311','E 4316','E 4326'], a:4,
+  ex:'철분이 든 E 4324 · E 4326 · E 4327 은 F, H 뿐입니다. 철분 때문에 무거워 위보기·수직에서는 쇳물이 흘러내립니다.' },
+
+{ unit:'2단원 전기용접',
+  q:'녹말·톱밥·셀룰로오스처럼 아크열에 분해되어 용융 금속을 공기로부터 지키는 피복제 성분은?',
+  ch:['가스 발생제','아크 안정제','고착제','탈산제','합금제'], a:0,
+  ex:'가스 발생제는 일산화탄소·이산화탄소·수증기 등을 내어 용접부를 대기로부터 차단하고 산화·질화를 막습니다.' },
+
+{ unit:'2단원 전기용접',
+  q:'피복제의 역할에 대한 설명으로 옳지 않은 것은?',
+  ch:['용융 금속의 산화와 질화를 막는다','슬래그를 만들어 급랭을 막는다','아크를 안정시킨다',
+      '용착 금속을 급랭시켜 빨리 굳게 한다','탈산 정련 작용을 한다'], a:3,
+  ex:'슬래그는 위를 덮어 천천히 식게 해 줍니다. 급랭시킨다는 설명은 반대입니다.' },
+
+{ unit:'2단원 전기용접',
+  q:'모재가 수평이고 위에서 내려다보며 하는 용접 자세의 기호는?',
+  ch:['F','H','V','O','B'], a:0,
+  ex:'아래보기 자세는 F(flat)입니다. 쇳물이 중력을 거스르지 않아 가장 쉬우므로 실습을 여기서 시작합니다.' },
+
+{ unit:'2단원 전기용접',
+  q:'수직면에서 용접선이 위아래 방향으로 진행하는 자세의 기호는?',
+  ch:['F','H','V','O','OH'], a:2,
+  ex:'수직 자세는 V(vertical)입니다. 같은 수직면이라도 용접선이 옆으로 가면 수평 자세 H 입니다.' },
+
+{ unit:'2단원 전기용접',
+  q:'용접봉에 아크가 한쪽으로 쏠리는 현상을 줄이는 방법으로 옳은 것은?',
+  ch:['교류 용접으로 바꾼다','접지점을 용접부에 될 수 있는 대로 가까이 둔다','아크 길이를 길게 한다',
+      '비피복 용접봉을 직류로 쓴다','받침쇠와 엔드 탭을 떼어 낸다'], a:0,
+  ex:'전류 방향이 계속 바뀌는 교류에서는 이 현상이 생기지 않습니다. 접지점은 멀리, 아크는 짧게 하는 것도 방법입니다.' },
+
+{ unit:'2단원 전기용접',
+  q:'아크를 중단한 자리가 오목하게 파여 남은 부분을 무엇이라 하는가?',
+  ch:['크레이터','언더컷','오버랩','스패터','용입 불량'], a:0,
+  ex:'크레이터에는 불순물과 편석이 남고 식는 동안 균열이 생길 수 있어, 아크를 짧게 다시 일으켜 메워 줍니다.' },
+
+{ unit:'2단원 전기용접',
+  q:'비드 가장자리의 모재가 파여 홈이 생긴 결함은?',
+  ch:['언더컷','오버랩','기공','크레이터','스패터'], a:0,
+  ex:'언더컷은 전류가 너무 세거나 운봉이 빠를 때 잘 생깁니다. 오버랩은 반대로 금속이 모재 위에 덮어씌워진 결함입니다.' },
+
+{ unit:'2단원 전기용접',
+  q:'녹은 금속이 모재에 융합되지 못하고 그 위에 덮어씌워진 결함은?',
+  ch:['언더컷','오버랩','스패터','기공','균열'], a:1,
+  ex:'오버랩입니다. 모재가 충분히 녹지 않았는데 용접봉만 많이 녹여 넣을 때 생깁니다.' },
+
+/* 3단원 */
+{ unit:'3단원 가스용접',
+  q:'산소 용기의 색과 충전 압력을 바르게 짝지은 것은?',
+  ch:['녹색 · 150kgf/cm²','노란색 · 150kgf/cm²','녹색 · 15.5kgf/cm²','노란색 · 15.5kgf/cm²','붉은색 · 15.5kgf/cm²'], a:0,
+  ex:'산소는 녹색 용기에 150kgf/cm², 아세틸렌은 노란 용기에 15.5kgf/cm² 로 충전합니다.' },
+
+{ unit:'3단원 가스용접',
+  q:'가스 용접에서 아세틸렌을 보내는 호스의 색은?',
+  ch:['빨간색','녹색','파란색','검은색','흰색'], a:0,
+  ex:'아세틸렌은 빨간 호스, 산소는 녹색 호스입니다. 용기 색(노란색/녹색)과 헷갈리지 않도록 합니다.' },
+
+{ unit:'3단원 가스용접',
+  q:'아세틸렌 가스의 성질로 옳은 것은?',
+  ch:['무색무취이며 공기보다 가볍다','무색무취이며 공기보다 무겁다','붉은색을 띠며 공기보다 무겁다',
+      '스스로 타지 않는 조연성 가스이다','공기 중에서 전혀 타지 않는다'], a:0,
+  ex:'아세틸렌은 무색무취의 가연성 가스이고 공기보다 가볍습니다. 새는 것을 알아채도록 양파 썩는 냄새를 넣어 둡니다.' },
+
+{ unit:'3단원 가스용접',
+  q:'산소 가스에 대한 설명으로 옳은 것은?',
+  ch:['스스로는 타지 않고 다른 물질이 타는 것을 돕는다','스스로 잘 타는 가연성 가스이다',
+      '공기보다 가볍다','노란색 용기에 넣는다','빨간 호스로 보낸다'], a:0,
+  ex:'산소는 조연성 가스입니다. 스스로 타지는 않지만 있으면 다른 것이 훨씬 잘 탑니다.' },
+
+{ unit:'3단원 가스용접',
+  q:'불꽃의 세 부분 가운데 온도가 가장 높으며 환원성을 띠는 곳은?',
+  ch:['불꽃심(백심)','속불꽃','겉불꽃','아세틸렌 페더','팁 내부'], a:1,
+  ex:'속불꽃이 가장 뜨겁고 환원성을 띱니다. 겉불꽃은 온도가 비교적 낮고 금속을 산화시킵니다.' },
+
+{ unit:'3단원 가스용접',
+  q:'가스 용접에서 산소와 아세틸렌의 혼합비가 1 : 1 정도가 되어 금속에 화학적 영향을 주지 않는 불꽃은?',
+  ch:['탄화 불꽃','중성 불꽃','산화 불꽃','아세틸렌 페더','예열 불꽃'], a:1,
+  ex:'중성 불꽃이며 보통 용접은 이 불꽃으로 합니다. 백심 끝에서 2~3㎜ 앞이 용접하는 자리입니다.' },
+
+{ unit:'3단원 가스용접',
+  q:'산소를 지나치게 많이 보냈을 때 생겨 용착 금속을 산화시키는 불꽃은?',
+  ch:['탄화 불꽃','중성 불꽃','산화 불꽃','환원 불꽃','아세틸렌 2배 과잉 불꽃'], a:2,
+  ex:'산화 불꽃은 산소 과잉 불꽃입니다. 백심이 짧고 뾰족해지며 전체 불꽃도 짧아집니다.' },
+
+{ unit:'3단원 가스용접',
+  q:'백심과 겉불꽃 사이에 흰 제3의 불꽃(페더)이 보이는 상태의 불꽃은?',
+  ch:['탄화 불꽃','중성 불꽃','산화 불꽃','예열 불꽃','절단 불꽃'], a:0,
+  ex:'탄화 불꽃은 아세틸렌 과잉 불꽃입니다. 산화 작용이 없어 스테인리스처럼 산화를 막아야 하는 금속의 용접에 씁니다.' },
+
+{ unit:'3단원 가스용접',
+  q:'팁 끝이 갑자기 막혀 불꽃이 토치의 혼합실까지 밀려 들어가는 현상은?',
+  ch:['역류','역화','인화','청정 작용','실드'], a:2,
+  ex:'인화입니다. 팁 끝의 막힘·과열·팁 죔 불량이 원인이므로 작업 전 팁을 깨끗이 청소해 둡니다.' },
+
+{ unit:'3단원 가스용접',
+  q:'토치의 팁이 막혀 고압의 산소가 아세틸렌 호스 쪽으로 거꾸로 흘러 들어가는 현상은?',
+  ch:['역류','역화','인화','과열','누설'], a:0,
+  ex:'역류입니다. 토치 내부 청소가 불량할 때 생기며, 일어나면 산소와 아세틸렌 밸브를 차례로 잠급니다.' },
+
+{ unit:'3단원 가스용접',
+  q:'역류가 일어났을 때 해야 할 조치로 옳은 것은?',
+  ch:['산소와 아세틸렌 밸브를 차례로 잠근다','산소 압력을 더 높인다','정상이므로 그대로 작업한다',
+      '불이 붙어 있는 상태로 팁을 정비한다','아세틸렌을 더 많이 공급한다'], a:0,
+  ex:'먼저 밸브를 잠가 불을 끄는 것이 첫 조치입니다. 불이 붙은 채로 팁을 만지면 안 됩니다.' },
+
+{ unit:'3단원 가스용접',
+  q:'용접용 가스가 갖추어야 할 성질로 옳은 것은?',
+  ch:['발열량이 클 것','연소 속도가 느릴 것','불꽃의 온도가 낮을 것',
+      '용융 금속과 화학 반응을 잘 일으킬 것','폭발 범위가 넓을 것'], a:0,
+  ex:'잘 녹이되 쇠를 망치지 않아야 합니다. 발열량이 크고, 연소 속도가 빠르며, 불꽃 온도가 높고, 금속과 반응하지 않아야 합니다.' },
+
+/* 4단원 */
+{ unit:'4단원 용접 안전',
+  q:'용접을 하지 않는 동안 보조 변압기로 용접기 전압을 20~30V 이하로 낮춰 감전을 막는 장치는?',
+  ch:['전격 방지 장치','접지 클램프','차광 유리','압력 조정기','치핑 해머'], a:0,
+  ex:'자동 전격 방지 장치입니다. 쉬는 사이에 홀더를 만졌다가 감전되는 사고를 막아 줍니다.' },
+
+{ unit:'4단원 용접 안전',
+  q:'피복 아크 용접 작업에 알맞은 차광 유리의 차광도 번호는?',
+  ch:['2~4번','4~6번','7~8번','10~12번','14번 이상'], a:3,
+  ex:'납땜은 2~4번, 가스 용접은 4~6번, 피복 아크 용접은 10~12번 정도를 씁니다. 번호가 클수록 빛을 많이 막습니다.' },
+
+{ unit:'4단원 용접 안전',
+  q:'용접 작업 중에 일어나는 재해로 보기 어려운 것은?',
+  ch:['감전','화상','화재·폭발','가스 중독','동상'], a:4,
+  ex:'용접의 주된 재해는 감전, 아크 광선에 의한 눈 손상, 화상, 화재·폭발, 가스 중독입니다.' },
+
+{ unit:'4단원 용접 안전',
+  q:'아크 광선으로부터 눈을 지키는 방법으로 옳은 것은?',
+  ch:['옆 사람이 아크를 켤 때도 눈을 가린다','내가 용접하지 않을 때는 보호구가 필요 없다',
+      '차광도 번호가 낮을수록 잘 막아 준다','헬멧 없이 잠깐 보는 것은 괜찮다',
+      '아크는 자외선을 내지 않으므로 위험하지 않다'], a:0,
+  ex:'아크에서는 자외선과 적외선이 나오며 몇 시간 뒤 전광성 안염이 옵니다. 내가 켜지 않아도 광선은 똑같이 들어옵니다.' },
+
+{ unit:'4단원 용접 안전',
+  q:'용접 작업 복장에 대한 설명으로 옳은 것은?',
+  ch:['바지 자락을 신발 밖으로 내려 덮는다','바지 자락을 신발 안으로 넣는다',
+      '장갑은 얇을수록 좋다','앞치마는 합성 섬유가 알맞다','팔덮개는 쓰지 않는 것이 편하다'], a:0,
+  ex:'바지 자락을 신발 안에 넣으면 튄 스패터가 신발 속으로 들어가 화상을 입습니다. 가죽처럼 질긴 보호구를 갖춰 입습니다.' },
 ];
 
-/* ── 3) 설정 ── */
+
+/* ── 3) 게임 ── */
+const POS_LIST = [
+  { k:'F', name:'아래보기 자세' },
+  { k:'H', name:'수평 자세' },
+  { k:'V', name:'수직 자세' },
+  { k:'O', name:'위보기 자세' },
+];
+
+const CIRCUIT = ['용접기','홀더 케이블','홀더','용접봉','아크','모재','접지 케이블'];
+
+const RODS = [
+  { code:'E 4301', kind:'일미나이트계' },
+  { code:'E 4303', kind:'라임티타니아계' },
+  { code:'E 4311', kind:'고셀룰로오스계' },
+  { code:'E 4313', kind:'고산화티탄계' },
+  { code:'E 4316', kind:'저수소계' },
+  { code:'E 4324', kind:'철분산화티탄계' },
+  { code:'E 4326', kind:'철분저수소계' },
+  { code:'E 4327', kind:'철분산화철계' },
+  { code:'E 4340', kind:'특수계' },
+];
+
+const FLAMES = [
+  { k:'carb', name:'탄화 불꽃' },
+  { k:'neut', name:'중성 불꽃' },
+  { k:'oxid', name:'산화 불꽃' },
+];
+
+/* ── 4) 설정 ── */
 const CFG = {
   practiceN : 8,     // 연습 문항 수
   examN     : 20,    // 종합시험 문항 수 (규약)
@@ -121,6 +777,7 @@ const CFG = {
 const $  = s => document.querySelector(s);
 const el = (h) => { const d=document.createElement('div'); d.innerHTML=h.trim(); return d.firstElementChild; };
 const shuffle = a => a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(v=>v[1]);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 const ST = load();
 function load(){
@@ -144,7 +801,9 @@ document.querySelectorAll('.tab').forEach(t=>{
 function render(view){
   const v = $('#view');
   v.innerHTML = '';
+  window.scrollTo(0,0);
   if(view==='learn')    return renderLearn(v);
+  if(view==='game')     return renderGamePick(v);
   if(view==='practice') return startQuiz(v,'practice');
   if(view==='exam')     return startQuiz(v,'exam');
   if(view==='wrong')    return renderWrong(v);
@@ -152,27 +811,314 @@ function render(view){
 
 /* ── 배우기 ── */
 function renderLearn(v){
+  let unit = '';
   LEARN.forEach(c=>{
+    if(c.unit !== unit){
+      unit = c.unit;
+      v.appendChild(el(`<h2 style="font-size:17px;margin:20px 0 8px">${esc(unit)}</h2>`));
+    }
     v.appendChild(el(`<div class="card">
-      <span class="pill">${c.unit||''}</span>
-      <h3>${c.t}</h3>
+      <span class="pill">${esc(c.unit||'')}</span>
+      <h3>${esc(c.t)}</h3>
       <div class="body">${c.body}</div>
     </div>`));
   });
   v.appendChild(el(`<div class="card row">
     <b>다 읽었으면</b>
-    <button class="btn btn-primary" id="goPractice">✏️ 연습 ${CFG.practiceN}문항 풀어보기</button>
+    <button class="btn btn-primary" id="goGame">🎮 게임으로 익히기</button>
+    <button class="btn" id="goPractice">✏️ 연습 ${CFG.practiceN}문항</button>
   </div>`));
+  $('#goGame').onclick     = ()=>document.querySelector('[data-view="game"]').click();
   $('#goPractice').onclick = ()=>document.querySelector('[data-view="practice"]').click();
+}
+
+/* ── 게임 고르기 ── */
+function renderGamePick(v){
+  v.appendChild(el(`<div class="card">
+    <h3>🎮 게임으로 익히기</h3>
+    <div class="muted" style="margin-bottom:10px">배우기에서 본 것을 손으로 해 봅니다. 결과는 게임마다 따로 제출됩니다.</div>
+    <div class="gpick">
+      <button class="gcard" data-g="flame"><b>🔥 불꽃 조절</b><span>산소 밸브를 돌려 주문받은 불꽃을 만든다 · 5라운드</span></button>
+      <button class="gcard" data-g="pos"><b>🧍 자세 맞히기</b><span>그림을 보고 용접 자세 기호를 고른다 · 8라운드</span></button>
+      <button class="gcard" data-g="circuit"><b>⚡ 회로 잇기</b><span>아크 용접 회로를 순서대로 잇는다 · 1판</span></button>
+      <button class="gcard" data-g="rod"><b>🏷️ 용접봉 해독</b><span>KS D 7004 종류 기호를 알아맞힌다 · 8라운드</span></button>
+    </div>
+  </div>`));
+  v.querySelectorAll('.gcard').forEach(b=>{
+    b.onclick = ()=>{
+      const g = b.dataset.g;
+      v.innerHTML='';
+      if(g==='flame')   return gameFlame(v);
+      if(g==='pos')     return gamePos(v);
+      if(g==='circuit') return gameCircuit(v);
+      if(g==='rod')     return gameRod(v);
+    };
+  });
+}
+
+function gameBackBtn(v){
+  const b = el('<div class="row" style="margin-top:4px"><button class="btn">← 다른 게임</button></div>');
+  b.querySelector('button').onclick = ()=>{ v.innerHTML=''; renderGamePick(v); };
+  return b;
+}
+
+/* 게임 공통 마무리 — 채점은 여기서 한 번만 합니다 */
+function gameFinish(v, title, correct, total, sec, wrongList){
+  const pct = Math.round(correct/total*100);
+  v.innerHTML = '';
+  v.appendChild(el(`<div class="card" style="text-align:center">
+    <div class="pill">${esc(title)}</div>
+    <div class="score" style="margin-top:6px">${pct}점</div>
+    <div class="muted">${total}판 중 ${correct}판 성공 · ${Math.floor(sec/60)}분 ${sec%60}초</div>
+    <div id="rankBox" style="margin-top:12px"></div>
+    <div id="rSubmitAnchor" style="margin-top:12px"></div>
+  </div>`));
+  if(wrongList && wrongList.length){
+    v.appendChild(el(`<div class="card"><h3>📕 놓친 것</h3>
+      <ul class="li">${wrongList.map(w=>`<li>${esc(w)}</li>`).join('')}</ul></div>`));
+  }
+  mountSubmit(pct, correct, total, sec, title, (wrongList||[]).map(w=>({txt:w})));
+  try{
+    if(window.FX && pct>=60){
+      FX.banner({ title: pct>=90?'훌륭합니다!':'통과!', sub:`${title} ${pct}점`,
+                  stars: FX.starsFor ? FX.starsFor(pct) : 0 });
+    }
+  }catch(e){ console.warn('FX', e); }
+  try{
+    if(window.Rank){
+      const res = Rank.award(pct, { mode:`용접 마스터 — ${title}` });
+      $('#rankBox').innerHTML = Rank.resultBox(res);
+    }
+  }catch(e){ console.warn('Rank', e); }
+  v.appendChild(gameBackBtn(v));
+}
+
+/* ── 게임 1 · 불꽃 조절 ── */
+function bandOf(o){ return o < 38 ? 'carb' : (o <= 62 ? 'neut' : 'oxid'); }
+
+function gameFlame(v){
+  const rounds = shuffle([...FLAMES, ...FLAMES]).slice(0,5);
+  let i=0, correct=0, combo=0, wrong=[], t0=Date.now();
+
+  function step(){
+    if(i>=rounds.length) return gameFinish(v,'불꽃 조절',correct,rounds.length,
+                                           Math.round((Date.now()-t0)/1000), wrong);
+    const target = rounds[i];
+    v.innerHTML='';
+    v.appendChild(el(`<div class="progress"><i style="width:${i/rounds.length*100}%"></i></div>`));
+    const card = el(`<div class="card">
+      <div class="qnum">${i+1} / ${rounds.length}
+        <span class="pill" style="margin-left:6px">${correct}판 성공</span>
+        <span class="combo" id="cmb"></span></div>
+      <div class="qtext">🔥 <b>${esc(target.name)}</b> 만들기</div>
+      <div class="muted">아세틸렌은 이미 열려 있습니다. <b>산소 밸브</b>만 돌려 맞추세요.</div>
+      <div id="flameBox" style="text-align:center"></div>
+      <div class="gauge"><span>아세틸렌 ◀</span>
+        <input class="slider" type="range" min="0" max="100" value="20" id="oxy">
+        <span>▶ 산소</span></div>
+      <div class="row"><button class="btn btn-primary" id="fire">이 불꽃으로 확정</button>
+        <span class="muted" id="oxlab"></span></div>
+      <div id="fex"></div>
+    </div>`);
+    v.appendChild(card);
+    v.appendChild(gameBackBtn(v));
+
+    const sl = card.querySelector('#oxy');
+    const box = card.querySelector('#flameBox');
+    const lab = card.querySelector('#oxlab');
+    const cmb = card.querySelector('#cmb');
+    if(combo>=2) cmb.textContent = ` 🔥 ${combo}연속`;
+
+    const draw = ()=>{ box.innerHTML = figFlame(bandOf(+sl.value), 320);
+                       lab.textContent = `산소 밸브 ${sl.value}`; };
+    sl.oninput = draw; draw();
+
+    card.querySelector('#fire').onclick = (e)=>{
+      const got = bandOf(+sl.value);
+      const ok = got === target.k;
+      sl.disabled = true;
+      e.target.disabled = true;
+      if(ok){ correct++; combo++; } else {
+        combo = 0;
+        wrong.push(`${target.name} → ${FLAMES.find(f=>f.k===got).name} 을 만듦`);
+      }
+      try{ if(window.FX) ok ? FX.ok(e.target) : FX.no(e.target); }catch(err){ console.warn('FX',err); }
+      const ex = card.querySelector('#fex');
+      ex.appendChild(el(`<div class="explain"><b>${ok?'맞았습니다':'만들어진 것은 '+FLAMES.find(f=>f.k===got).name}</b><br>
+        산소를 조금씩 더 열면 탄화 → 중성 → 산화 순으로 바뀌고 불꽃은 점점 짧고 뾰족해집니다.</div>`));
+      const nx = el(`<div class="row" style="margin-top:10px">
+        <button class="btn btn-primary">${i+1>=rounds.length?'결과 보기':'다음 →'}</button></div>`);
+      ex.appendChild(nx);
+      nx.querySelector('button').onclick = ()=>{ i++; step(); };
+    };
+  }
+  step();
+}
+
+/* ── 게임 2 · 자세 맞히기 ── */
+function gamePos(v){
+  const rounds = shuffle([...POS_LIST,...POS_LIST]).slice(0,8);
+  let i=0, correct=0, combo=0, wrong=[], t0=Date.now();
+
+  function step(){
+    if(i>=rounds.length) return gameFinish(v,'자세 맞히기',correct,rounds.length,
+                                           Math.round((Date.now()-t0)/1000), wrong);
+    const t = rounds[i];
+    v.innerHTML='';
+    v.appendChild(el(`<div class="progress"><i style="width:${i/rounds.length*100}%"></i></div>`));
+    const card = el(`<div class="card">
+      <div class="qnum">${i+1} / ${rounds.length}
+        <span class="pill" style="margin-left:6px">${correct}판 성공</span>
+        <span class="combo">${combo>=2?' 🔥 '+combo+'연속':''}</span></div>
+      <div class="qtext">이 그림이 나타내는 용접 자세의 기호는?</div>
+      <div style="text-align:center">${figPos(t.k)}</div>
+      <div id="chs"></div><div id="pex"></div>
+    </div>`);
+    v.appendChild(card);
+    v.appendChild(gameBackBtn(v));
+
+    const chs = card.querySelector('#chs');
+    shuffle(POS_LIST.slice()).forEach(o=>{
+      const b = el(`<button class="choice">${o.k}</button>`);
+      b.onclick = ()=>{
+        const ok = o.k === t.k;
+        card.querySelectorAll('.choice').forEach(x=>{
+          x.disabled = true;
+          if(x.textContent.trim()===t.k) x.classList.add('correct');
+        });
+        b.classList.add('picked', ok?'correct':'wrong');
+        if(ok){ correct++; combo++; } else { combo=0; wrong.push(`${t.name}(${t.k}) → ${o.k} 로 봄`); }
+        try{ if(window.FX) ok ? FX.ok(b) : FX.no(b); }catch(err){ console.warn('FX',err); }
+        const ex = card.querySelector('#pex');
+        ex.appendChild(el(`<div class="explain"><b>${ok?'맞았습니다':'정답은 '+t.k}</b> — ${esc(t.name)}<br>
+          모재가 수평이면 F 아니면 O(어느 쪽 면을 붙이는가), 수직면이면 용접선이 옆으로 가면 H, 위아래로 가면 V 입니다.</div>`));
+        const nx = el(`<div class="row" style="margin-top:10px">
+          <button class="btn btn-primary">${i+1>=rounds.length?'결과 보기':'다음 →'}</button></div>`);
+        ex.appendChild(nx);
+        nx.querySelector('button').onclick = ()=>{ i++; step(); };
+      };
+      chs.appendChild(b);
+    });
+  }
+  step();
+}
+
+/* ── 게임 3 · 회로 잇기 ── */
+function gameCircuit(v){
+  const t0 = Date.now();
+  let idx = 0, miss = 0, wrong = [];
+  v.innerHTML='';
+  const card = el(`<div class="card">
+    <h3>⚡ 아크 용접 회로 잇기</h3>
+    <div class="muted">전류가 흘러가는 차례대로 눌러 회로를 완성하세요.
+      마지막에는 다시 용접기로 돌아옵니다.</div>
+    <div class="slot" id="slot"><span class="muted">여기에 차례로 놓입니다</span></div>
+    <div class="seq" id="pool"></div>
+    <div id="cex"></div>
+  </div>`);
+  v.appendChild(card);
+  v.appendChild(gameBackBtn(v));
+
+  const slot = card.querySelector('#slot');
+  const pool = card.querySelector('#pool');
+  shuffle(CIRCUIT.slice()).forEach(name=>{
+    const c = el(`<button class="chip">${esc(name)}</button>`);
+    c.onclick = ()=>{
+      if(c.classList.contains('used')) return;
+      const want = CIRCUIT[idx];
+      if(name === want){
+        c.classList.add('used'); c.disabled = true;
+        if(idx===0) slot.innerHTML='';
+        slot.appendChild(el(`<span class="chip">${idx+1}. ${esc(name)}</span>`));
+        idx++;
+        try{ if(window.FX) FX.ok(c); }catch(e){ console.warn('FX',e); }
+        if(idx >= CIRCUIT.length){
+          slot.appendChild(el('<span class="chip">8. 용접기로 돌아옴</span>'));
+          const sec = Math.round((Date.now()-t0)/1000);
+          const total = CIRCUIT.length;
+          const correct = Math.max(0, total - miss);
+          setTimeout(()=>gameFinish(v,'회로 잇기',correct,total,sec,wrong), 500);
+        }
+      } else {
+        miss++;
+        wrong.push(`${idx+1}번째에 「${name}」 고름`);
+        c.classList.add('bad');
+        setTimeout(()=>c.classList.remove('bad'), 500);
+        try{ if(window.FX) FX.no(c); }catch(e){ console.warn('FX',e); }
+      }
+    };
+    pool.appendChild(c);
+  });
+}
+
+/* ── 게임 4 · 용접봉 해독 ── */
+function gameRod(v){
+  const rounds = shuffle(RODS.slice()).slice(0,8);
+  let i=0, correct=0, combo=0, wrong=[], t0=Date.now();
+
+  function step(){
+    if(i>=rounds.length) return gameFinish(v,'용접봉 해독',correct,rounds.length,
+                                           Math.round((Date.now()-t0)/1000), wrong);
+    const t = rounds[i];
+    const ask = i % 2 === 0;   // 짝수 판은 기호→계통, 홀수 판은 계통→기호
+    const others = shuffle(RODS.filter(r=>r.code!==t.code)).slice(0,3);
+    const opts = shuffle([t, ...others]);
+    v.innerHTML='';
+    v.appendChild(el(`<div class="progress"><i style="width:${i/rounds.length*100}%"></i></div>`));
+    const card = el(`<div class="card">
+      <div class="qnum">${i+1} / ${rounds.length}
+        <span class="pill" style="margin-left:6px">${correct}판 성공</span>
+        <span class="combo">${combo>=2?' 🔥 '+combo+'연속':''}</span></div>
+      <div class="qtext">${ask ? `<span style="font-size:26px;font-weight:900">${esc(t.code)}</span><br>이 용접봉의 피복제 계통은?`
+                               : `<b>${esc(t.kind)}</b> 용접봉의 종류 기호는?`}</div>
+      <div id="chs"></div><div id="rex"></div>
+    </div>`);
+    v.appendChild(card);
+    v.appendChild(gameBackBtn(v));
+
+    const chs = card.querySelector('#chs');
+    const label = o => ask ? o.kind : o.code;
+    opts.forEach(o=>{
+      const b = el(`<button class="choice">${esc(label(o))}</button>`);
+      b.onclick = ()=>{
+        const ok = o.code === t.code;
+        card.querySelectorAll('.choice').forEach(x=>{
+          x.disabled = true;
+          if(x.textContent.trim()===label(t)) x.classList.add('correct');
+        });
+        b.classList.add('picked', ok?'correct':'wrong');
+        if(ok){ correct++; combo++; } else { combo=0; wrong.push(`${t.code} = ${t.kind} 놓침`); }
+        try{ if(window.FX) ok ? FX.ok(b) : FX.no(b); }catch(err){ console.warn('FX',err); }
+        const ex = card.querySelector('#rex');
+        ex.appendChild(el(`<div class="explain"><b>${ok?'맞았습니다':'정답은 '+esc(label(t))}</b><br>
+          ${esc(t.code)} — ${esc(t.kind)} (KS D 7004). E 는 피복 아크 용접봉, 43 은 용착 금속의 최소 인장 강도,
+          뒤 두 자리가 피복제의 계통입니다.</div>`));
+        const nx = el(`<div class="row" style="margin-top:10px">
+          <button class="btn btn-primary">${i+1>=rounds.length?'결과 보기':'다음 →'}</button></div>`);
+        ex.appendChild(nx);
+        nx.querySelector('button').onclick = ()=>{ i++; step(); };
+      };
+      chs.appendChild(b);
+    });
+  }
+  step();
 }
 
 /* ── 문제 풀이 ──
    연습  : 고르는 즉시 정답·해설 공개, 점수 실시간, 연출 있음
    종합  : 아무것도 알려주지 않음, 점수 감춤, 연출 없음 (규약 2)  */
+/* 보기 순서도 섞습니다 — 안 섞으면 정답이 1번에 몰려 「늘 1번」이 통해 버립니다.
+   섞은 뒤 정답 번호를 다시 매겨 두므로 해설·오답노트가 모두 새 번호를 따라갑니다.
+   ?fix= 로 들어오면 fixorder.js 가 Math.random 을 고정하므로 반 전체가 같은 순서를 봅니다. */
+function shuffleChoices(q){
+  const order = shuffle(q.ch.map((_,i)=>i));
+  return Object.assign({}, q, { ch: order.map(i=>q.ch[i]), a: order.indexOf(q.a) });
+}
+
 function startQuiz(v, mode){
   const n = mode==='exam' ? CFG.examN : CFG.practiceN;
   quiz = { mode, i:0, correct:0, picks:[],
-           list: shuffle(QUESTIONS.slice()).slice(0, Math.min(n, QUESTIONS.length)),
+           list: shuffle(QUESTIONS.slice()).slice(0, Math.min(n, QUESTIONS.length)).map(shuffleChoices),
            startTime: Date.now() };
   if(!quiz.list.length){ v.appendChild(el('<div class="empty">문항이 아직 없습니다.</div>')); return; }
   drawQ(v);
@@ -187,7 +1133,7 @@ function drawQ(v){
       <div class="qnum">${quiz.i+1} / ${quiz.list.length}
         ${isExam ? '<span class="pill" style="margin-left:6px">채점은 마지막에</span>'
                  : `<span class="pill" style="margin-left:6px">${quiz.correct}개 맞힘</span>`}</div>
-      <div class="qtext">${q.q}</div>
+      <div class="qtext">${esc(q.q)}</div>
       <div id="chs"></div>
       <div id="exp"></div>
     </div>`);
@@ -195,7 +1141,7 @@ function drawQ(v){
 
   const chs = card.querySelector('#chs');
   q.ch.forEach((c,idx)=>{
-    const b = el(`<button class="choice">${idx+1}. ${c}</button>`);
+    const b = el(`<button class="choice">${idx+1}. ${esc(c)}</button>`);
     b.onclick = ()=>pick(v, idx, b);
     chs.appendChild(b);
   });
@@ -223,7 +1169,7 @@ function pick(v, idx, btn){
   try{ if(window.FX) ok ? FX.ok(btn) : FX.no(btn); }catch(e){ console.warn('FX', e); }
 
   const exp = document.querySelector('#exp');
-  exp.appendChild(el(`<div class="explain"><b>${ok?'맞았습니다':'정답은 '+(q.a+1)+'번'}</b><br>${q.ex||''}</div>`));
+  exp.appendChild(el(`<div class="explain"><b>${ok?'맞았습니다':'정답은 '+(q.a+1)+'번'}</b><br>${esc(q.ex||'')}</div>`));
   const next = el(`<div class="row" style="margin-top:12px">
       <button class="btn btn-primary">${quiz.i+1>=quiz.list.length?'결과 보기':'다음 문제 →'}</button></div>`);
   exp.appendChild(next);
@@ -249,6 +1195,7 @@ function finish(v){
   const part = quiz.mode==='exam' ? '종합시험' : '연습';
 
   v.innerHTML = '';
+  window.scrollTo(0,0);
   v.appendChild(el(`<div class="card" style="text-align:center">
       <div class="score">${pct}점</div>
       <div class="muted">${n}문항 중 ${quiz.correct}개 정답 · ${Math.floor(sec/60)}분 ${sec%60}초</div>
@@ -262,17 +1209,16 @@ function finish(v){
     v.appendChild(el('<div class="card"><h3>📕 틀린 문제</h3></div>'));
     bad.forEach(p=>{
       v.appendChild(el(`<div class="card">
-        <span class="pill">${p.q.unit||''}</span>
-        <div class="qtext">${p.q.q}</div>
-        <div class="muted">내가 고른 답 : ${p.pick+1}. ${p.q.ch[p.pick]}</div>
-        <div style="color:var(--ok);font-weight:700">정답 : ${p.q.a+1}. ${p.q.ch[p.q.a]}</div>
-        <div class="explain">${p.q.ex||''}</div>
+        <span class="pill">${esc(p.q.unit||'')}</span>
+        <div class="qtext">${esc(p.q.q)}</div>
+        <div class="muted">내가 고른 답 : ${p.pick+1}. ${esc(p.q.ch[p.pick])}</div>
+        <div style="color:var(--ok);font-weight:700">정답 : ${p.q.a+1}. ${esc(p.q.ch[p.q.a])}</div>
+        <div class="explain">${esc(p.q.ex||'')}</div>
       </div>`));
     });
   }
 
-  /* 제출을 먼저 붙입니다 — 연출·계급에서 오류가 나도 제출 버튼은 살아 있어야 합니다.
-     (실제로 소리 재생이 막힌 환경에서 FX 가 던진 오류에 제출 버튼이 통째로 사라진 적이 있습니다) */
+  /* 제출을 먼저 붙입니다 — 연출·계급에서 오류가 나도 제출 버튼은 살아 있어야 합니다. */
   mountSubmit(pct, quiz.correct, n, sec, part, bad);
 
   try{
@@ -283,8 +1229,8 @@ function finish(v){
   }catch(e){ console.warn('FX', e); }
   try{
     if(window.Rank){
-      const res = Rank.award(pct, { mode:`용접 마스터 — ${part}` });   // RP 정산
-      $('#rankBox').innerHTML = Rank.resultBox(res);                     // 문자열 HTML 을 돌려줍니다
+      const res = Rank.award(pct, { mode:`용접 마스터 — ${part}` });
+      $('#rankBox').innerHTML = Rank.resultBox(res);
     }
   }catch(e){ console.warn('Rank', e); }
 }
@@ -295,7 +1241,10 @@ function mountSubmit(pct, correct, total, sec, part, bad){
   lastResult = {
     mode   : `용접 마스터 — ${part}`,
     score  : pct, correct, total,
-    wrong  : bad.map(p => `${p.q.unit||''} ${p.q.q.slice(0,24)}… → 정답 ${p.q.a+1}번`),
+    /* 보기 순서를 학생마다 섞으므로 「정답 2번」은 시트에서 뜻이 없습니다.
+       무엇을 골랐고 무엇이 정답인지 글로 남깁니다(규약 1 ②). */
+    wrong  : (bad||[]).map(p => p.txt ? p.txt
+                : `${p.q.unit||''} ${p.q.q.slice(0,22)}… : ${p.q.ch[p.pick]} → 정답 ${p.q.ch[p.q.a]}`),
     durationSec : sec,
   };
   const anchor = $('#rSubmitAnchor');
@@ -320,16 +1269,16 @@ function renderWrong(v){
   $('#clrWrong').onclick = ()=>{ ST.wrong=[]; save(); render('wrong'); };
   ST.wrong.forEach(w=>{
     v.appendChild(el(`<div class="card">
-      <span class="pill">${w.unit}</span>
-      <div class="qtext">${w.q}</div>
-      <div class="muted">내가 고른 답 : ${w.pick+1}. ${w.ch[w.pick]}</div>
-      <div style="color:var(--ok);font-weight:700">정답 : ${w.a+1}. ${w.ch[w.a]}</div>
-      <div class="explain">${w.ex}</div>
+      <span class="pill">${esc(w.unit)}</span>
+      <div class="qtext">${esc(w.q)}</div>
+      <div class="muted">내가 고른 답 : ${w.pick+1}. ${esc(w.ch[w.pick])}</div>
+      <div style="color:var(--ok);font-weight:700">정답 : ${w.a+1}. ${esc(w.ch[w.a])}</div>
+      <div class="explain">${esc(w.ex)}</div>
     </div>`));
   });
 }
 
-$('#hdSub').textContent = `문항 ${QUESTIONS.length} · 개념 ${LEARN.length}`;
+$('#hdSub').textContent = `개념 ${LEARN.length} · 게임 4 · 문항 ${QUESTIONS.length}`;
 render('learn');
 </script>
 
