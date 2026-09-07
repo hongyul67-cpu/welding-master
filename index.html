@@ -20,11 +20,15 @@
   header h1{font-size:20px;margin:0;font-weight:800}
   header .sub{color:var(--dim);font-size:13px}
 
-  /* 탭 — class-mode.js 가 .tab 을 인식합니다 */
+  /* 탭 */
   .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
   .tab{padding:9px 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);
        cursor:pointer;font-weight:700;font-size:14px;color:var(--dim)}
   .tab.on{background:var(--pri);border-color:var(--pri);color:#fff}
+
+  /* 수업 슬라이드 열기 — 화면을 바꾸는 탭이 아니라 별도 창을 여는 단추라 따로 둡니다 */
+  .slidebtn{padding:9px 14px;border:1px solid #1f2937;border-radius:999px;background:#111827;
+       cursor:pointer;font-weight:700;font-size:14px;color:#fff;margin-left:auto}
 
   .card{background:var(--card);border:1px solid var(--line);border-radius:14px;
         padding:16px 18px;margin-bottom:12px}
@@ -38,7 +42,7 @@
   .btn:disabled{opacity:.5;cursor:default}
   .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 
-  /* 문제 — class-mode.js 가 .choice / .explain 을 인식합니다 */
+  /* 문제 */
   .qnum{color:var(--dim);font-size:13px;font-weight:700}
   .qtext{font-size:17px;font-weight:700;margin:6px 0 12px;line-height:1.5}
   .choice{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--card);
@@ -105,6 +109,7 @@
     <button class="tab"    data-view="practice">✏️ 연습 8문항</button>
     <button class="tab"    data-view="exam">🏁 종합시험 20문항</button>
     <button class="tab"    data-view="wrong">📕 오답노트</button>
+    <button class="slidebtn" type="button" id="slideBtn">📽️ 수업 슬라이드 열기</button>
   </div>
 
   <div id="view"></div>
@@ -789,7 +794,43 @@ function save(){ try{ localStorage.setItem(CFG.storeKey, JSON.stringify(ST)); }c
 let quiz = null;          // 지금 풀고 있는 세트
 let lastResult = null;    // 제출용 결과
 
+/* ── 수업 슬라이드 (교실 화면용) ──────────────────────
+   원고는 lesson.js, 화면은 links/board-pro.js(공용 뷰어)가 담당한다.
+   board-pro.js 는 공용이라 이 저장소로 복사하지 않고 고치지도 않는다.
+   배우기 카드는 그대로 있다 — 이것은 별도의 한 벌이다. */
+function openSlides(){
+  const ALL = window.LESSON || [], FIG = window.FIGS || {};
+  if(!ALL.length || typeof BoardPro === 'undefined'){
+    alert('수업 슬라이드를 불러오지 못했습니다. 인터넷 연결을 확인해 주세요.');
+    return;
+  }
+  const units = [];
+  ALL.forEach((s,i)=>{
+    let g = units.find(x=>x.name===s.u);
+    if(!g){ g={name:s.u, idx:[]}; units.push(g); }
+    g.idx.push(i);
+  });
+  const MENU = units.map(U=>({
+    icon:'📘', title:U.name, desc:'슬라이드 '+U.idx.length+'장',
+    run:{ kind:'lesson', deck:U.idx.map(i=>ALL[i]) }
+  }));
+  MENU.push({icon:'📚', wide:true, title:'전체 이어서 ('+ALL.length+'장)',
+             desc:'1단원부터 끝까지', run:{kind:'lesson', deck:ALL}});
+  MENU.push({icon:'⬜', wide:true, title:'빈 칠판',
+             desc:'슬라이드 없이 판서만', run:{kind:'blank'}});
+
+  BoardPro.open({
+    title:'📽️ 용접 · 수업 슬라이드',
+    sub:'요점 → <b>발문</b> → 퀴즈 → 정답을 하나씩 엽니다. 화면 어디든 바로 판서됩니다.<br>'+
+        '요점 속 <b>파란 빈칸</b>은 눌러야 답이 보입니다.',
+    menu: MENU,
+    fig: s => (s.fig && FIG[s.fig]) ? FIG[s.fig]() : ''
+  });
+}
+
 /* ── 화면 전환 ── */
+$('#slideBtn').onclick = openSlides;
+
 document.querySelectorAll('.tab').forEach(t=>{
   t.onclick = ()=>{
     document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
@@ -1286,8 +1327,12 @@ render('learn');
 <script src="https://hongyul67-cpu.github.io/links/collector.js"  data-tool="용접 마스터"></script>
 <script src="https://hongyul67-cpu.github.io/links/fx.js"></script>
 <script src="https://hongyul67-cpu.github.io/links/rank.js"       data-tool="제도 마스터" data-pace="class"></script>
-<script src="https://hongyul67-cpu.github.io/links/class-mode.js"></script>
 <script src="https://hongyul67-cpu.github.io/links/reset.js"></script>
 <script src="https://hongyul67-cpu.github.io/links/backbar.js"></script>
+
+<!-- 수업 슬라이드 : 원고(lesson.js) + 화면(links/board-pro.js).
+     board-pro.js 는 공용 뷰어라 이 저장소로 복사하지 않고 고치지도 않는다. -->
+<script src="lesson.js"></script>
+<script src="https://hongyul67-cpu.github.io/links/board-pro.js"></script>
 </body>
 </html>
