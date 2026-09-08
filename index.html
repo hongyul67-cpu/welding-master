@@ -93,6 +93,16 @@
         border:1px dashed var(--line);border-radius:10px;padding:8px;background:#fbfcfe}
   .slot .chip{cursor:default}
   .combo{font-weight:800;color:var(--warn)}
+
+  /* 자세별 실습 영상 링크 */
+  .vidrow{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0 4px}
+  .vidlink{display:inline-flex;flex-direction:column;align-items:center;gap:1px;
+    text-decoration:none;background:#fff1f0;border:1px solid #f3c6c4;color:#b4322f;
+    border-radius:10px;padding:8px 13px;font-size:13.5px;font-weight:800;line-height:1.25}
+  .vidlink:hover{background:#ffe3e1;border-color:#e5484d}
+  .vidlink .vsub{font-size:11px;font-weight:600;color:#8a6a68}
+  .vidlink.sm{padding:5px 10px;font-size:12px;border-radius:8px}
+  .vidlink.sm .vsub{font-size:10px}
 </style>
 </head>
 <body>
@@ -175,6 +185,30 @@ function figCircuit(){ return `
   <text x="100" y="146" font-size="11" text-anchor="middle" fill="#2563eb">접지 케이블</text>
 </svg>
 <div class="figcap">전류가 한 바퀴 돌아 제자리로 오는 닫힌 회로입니다</div>`; }
+
+/* 자세별 실습 영상 — 유튜브 링크.
+   교실 자료 폴더에 자세 영상 4개(mp4 174MB)가 있으나 Pages 저장소에 올릴 크기가 아니라
+   **같은 내용을 담은 공개 영상**을 걸어 둔다. 아래보기·수평·수직은 충남산업기술교육원의
+   6T 연속 강좌라 세 자세를 같은 방식으로 비교해 볼 수 있다. 위보기만 다른 채널이다.
+   (수평·수직은 다른 사이트에 끼워 넣는 것이 막혀 있어 iframe 이 아니라 새 창으로 연다.)
+   주소가 죽으면 이 표만 고치면 배우기·슬라이드 두 곳이 함께 바뀐다. — 확인일 2026-09-08 */
+var POSVID = {
+  F:{ id:'tlc2d7DNCnE', by:'충남산업기술교육원', len:'약 13분', t:'피복아크용접(전기용접) 6T 아래보기' },
+  H:{ id:'kaKswf6vTUg', by:'충남산업기술교육원', len:'약 12분', t:'피복아크용접(전기용접) 6T 수평자세' },
+  V:{ id:'-7Nn7rVadZk', by:'충남산업기술교육원', len:'약 13분', t:'피복아크용접(전기용접) 6T 수직자세' },
+  O:{ id:'rJtg_Gm3GTU', by:'안티비 용접',       len:'약 6분',  t:'용접 산업기사 실기 — 전기용접 6T 위보기 자세' }
+};
+var POSNAME = { F:'아래보기(F)', H:'수평(H)', V:'수직(V)', O:'위보기(O)' };
+function vidLink(k, small){
+  var v = POSVID[k]; if(!v) return '';
+  return '<a class="vidlink' + (small?' sm':'') + '" target="_blank" rel="noopener"' +
+         ' href="https://www.youtube.com/watch?v=' + v.id + '"' +
+         ' title="' + v.t + ' — ' + v.by + '">▶ ' + POSNAME[k] + ' 실습 영상 <span class="vsub">' +
+         v.by + ' · ' + v.len +
+         /* 슬라이드에서는 판서(펜)가 켜져 있으면 눌러도 안 열린다 — 공용 뷰어가 그 위를 덮기
+            때문이다. 교실에서 헤매지 않게 단추에 바로 적어 둔다. */
+         (small ? ' · Esc(선택) 뒤 누르기' : '') + '</span></a>';
+}
 
 /* 용접 자세 — 게임에서도 그대로 씁니다 (그림이 답을 흘리지 않게 기호는 넣지 않음) */
 function figPos(k){
@@ -400,7 +434,10 @@ const LEARN = [
   '<tr><td class="c">V</td><td>수직</td><td>수직면에서 용접선이 <b>위아래로</b> 간다 (vertical)</td></tr>' +
   '<tr><td class="c">O</td><td>위보기</td><td>모재 <b>아래</b>에서 올려다보며 한다 (overhead)</td></tr></table>' +
   '<div class="explain">F 가 가장 쉽고 O 가 가장 어렵습니다. 쇳물이 중력을 거슬러야 하기 때문입니다. ' +
-  '그래서 실습은 언제나 아래보기부터 시작합니다.</div>' },
+  '그래서 실습은 언제나 아래보기부터 시작합니다.</div>' +
+  '<div class="vidrow">' + vidLink('F') + vidLink('H') + vidLink('V') + vidLink('O') + '</div>' +
+  '<div class="figcap">실제로 어떻게 하는지 — 자세마다 실습 영상을 새 창으로 엽니다. ' +
+  '아래보기·수평·수직은 같은 곳에서 만든 6T 연속 강좌라 셋을 나란히 비교하기 좋습니다.</div>' },
 
 { unit:'2단원 전기용접', t:'아크 쏠림(자기 불림)', body:
   '용접봉에 아크가 <b>한쪽으로 쏠리는</b> 현상입니다. 전류가 만드는 자기장이 용접부에 대해 ' +

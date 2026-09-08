@@ -46,13 +46,23 @@ function panel(html) {
          h + '</div>';
 }
 
+function posPanel(k) {
+  var link = (typeof vidLink === 'function') ? vidLink(k, true) : '';
+  return panel(figPos(k)) +
+    (link ? '<div style="text-align:center;margin-top:6px">' + link + '</div>' : '');
+}
+
 var FIGS = {
   terms      : function () { return panel(figWeldTerms()); },
   circuit    : function () { return panel(figCircuit()); },
-  posF       : function () { return panel(figPos('F')); },
-  posH       : function () { return panel(figPos('H')); },
-  posV       : function () { return panel(figPos('V')); },
-  posO       : function () { return panel(figPos('O')); },
+  /* 자세 넷은 그림 옆에 실습 영상 단추를 함께 둔다.
+     주소는 index.html 의 POSVID 하나에서 온다(배우기와 같은 것을 본다).
+     교실에서는 판서가 켜져 있으면 단추가 눌리지 않는다 — Esc(선택)로 바꾼 뒤 누른다.
+     그래서 새 창으로 연다. 슬라이드는 그대로 남아 영상을 보고 돌아오면 이어서 진행된다. */
+  posF       : function () { return posPanel('F'); },
+  posH       : function () { return posPanel('H'); },
+  posV       : function () { return posPanel('V'); },
+  posO       : function () { return posPanel('O'); },
   cylinders  : function () { return panel(figCylinders()); },
   flameLabel : function () { return panel(figFlameLabel()); },
   flameCarb  : function () { return panel(figFlame('carb', 330)); },
