@@ -6,6 +6,9 @@
 <title>용접 마스터</title>
 <!-- 수업용 「모두 같은 문제」 — 다른 공용 스크립트보다 먼저 -->
 <script src="https://hongyul67-cpu.github.io/links/fixorder.js"></script>
+<!-- 그림: 공용 도우미 + 이 도구의 그림 모음(배우기·수업 슬라이드가 함께 씀). lesson.js 보다 먼저 -->
+<script src="https://hongyul67-cpu.github.io/links/fig.js"></script>
+<script src="figs.js"></script>
 <style>
   :root{
     --bg:#f5f6f8; --card:#fff; --line:#e2e5ea; --tx:#1c2430; --dim:#6b7684;
@@ -69,6 +72,9 @@
   table.t td.c,table.t th.c{text-align:center}
   .fig{display:block;margin:10px auto;max-width:100%;height:auto}
   .figcap{text-align:center;color:var(--dim);font-size:12.5px;margin-top:-2px}
+  .lfig{margin:4px 0 12px}
+  .lfig .fig-gallery{grid-template-columns:1fr}
+  .lfig figure.fig{max-width:560px;margin:0 auto}
   ul.li{margin:6px 0 0;padding-left:20px}
   ul.li li{margin-bottom:3px}
   .warnbox{background:#fff8e8;border-left:3px solid var(--warn);border-radius:0 8px 8px 0;
@@ -143,48 +149,8 @@
    그림 — 외부 이미지는 깨지므로 SVG 를 직접 그립니다
    ──────────────────────────────────────────────── */
 
-/* 용접될 때 일어나는 현상: 용적·용융지·용입·용착 */
-function figWeldTerms(){ return `
-<svg class="fig" viewBox="0 0 320 190" width="320" role="img" aria-label="용접부 단면 그림">
-  <rect x="10" y="105" width="300" height="70" fill="#c9d1dc" stroke="#8b95a4"/>
-  <path d="M120 105 q40 34 80 0 z" fill="#f0a35e" stroke="#c07a34"/>
-  <path d="M120 105 q40 -22 80 0" fill="#ffd7a8" stroke="#c07a34"/>
-  <rect x="152" y="8" width="12" height="62" fill="#7d8794"/>
-  <rect x="152" y="8" width="12" height="46" fill="#4a5560"/>
-  <circle cx="158" cy="84" r="9" fill="#ff9f43" stroke="#c07a34"/>
-  <line x1="158" y1="70" x2="158" y2="76" stroke="#ff6b00" stroke-width="3"/>
-  <text x="176" y="88" font-size="12" fill="#1c2430">용적</text>
-  <text x="212" y="100" font-size="12" fill="#1c2430">용착</text>
-  <line x1="208" y1="96" x2="186" y2="99" stroke="#6b7684"/>
-  <text x="120" y="152" font-size="12" fill="#1c2430">용입</text>
-  <line x1="140" y1="148" x2="158" y2="132" stroke="#6b7684"/>
-  <text x="26" y="122" font-size="12" fill="#1c2430">용융지</text>
-  <line x1="66" y1="118" x2="132" y2="112" stroke="#6b7684"/>
-  <text x="252" y="30" font-size="12" fill="#6b7684">용접봉</text>
-  <text x="14" y="186" font-size="12" fill="#6b7684">모재</text>
-</svg>
-<div class="figcap">용접부 단면 — 용적 · 용융지 · 용입 · 용착</div>`; }
-
-/* 아크 용접 회로 */
-function figCircuit(){ return `
-<svg class="fig" viewBox="0 0 340 180" width="340" role="img" aria-label="아크 용접 회로 그림">
-  <rect x="12" y="52" width="76" height="62" rx="6" fill="#eef1f5" stroke="#8b95a4"/>
-  <text x="50" y="80" font-size="12" text-anchor="middle" fill="#1c2430">용접기</text>
-  <text x="50" y="97" font-size="11" text-anchor="middle" fill="#6b7684">(전원)</text>
-  <path d="M88 66 H150" stroke="#e5484d" stroke-width="3" fill="none"/>
-  <text x="119" y="59" font-size="11" text-anchor="middle" fill="#e5484d">홀더 케이블</text>
-  <rect x="150" y="56" width="34" height="20" rx="4" fill="#4a5560"/>
-  <text x="167" y="50" font-size="11" text-anchor="middle" fill="#1c2430">홀더</text>
-  <rect x="184" y="63" width="46" height="7" fill="#7d8794"/>
-  <text x="207" y="58" font-size="11" text-anchor="middle" fill="#1c2430">용접봉</text>
-  <path d="M230 70 l10 16 -6 0 8 14" stroke="#f5a524" stroke-width="3" fill="none"/>
-  <text x="256" y="86" font-size="11" fill="#f5a524">아크</text>
-  <rect x="150" y="112" width="176" height="20" fill="#c9d1dc" stroke="#8b95a4"/>
-  <text x="238" y="126" font-size="12" text-anchor="middle" fill="#1c2430">모재</text>
-  <path d="M150 122 H50 V114" stroke="#2563eb" stroke-width="3" fill="none"/>
-  <text x="100" y="146" font-size="11" text-anchor="middle" fill="#2563eb">접지 케이블</text>
-</svg>
-<div class="figcap">전류가 한 바퀴 돌아 제자리로 오는 닫힌 회로입니다</div>`; }
+/* 용접부 단면 · 아크 회로 · 산소/아세틸렌 용기 · 불꽃의 구성 그림은 figs.js 로 옮겼다(그림17).
+   배우기 카드와 수업 슬라이드가 같은 그림을 쓴다. */
 
 /* 자세별 실습 영상 — 유튜브 링크.
    교실 자료 폴더에 자세 영상 4개(mp4 174MB)가 있으나 Pages 저장소에 올릴 크기가 아니라
@@ -280,43 +246,6 @@ function figFlame(kind, w){
   <text x="30" y="${cy+30}" font-size="11" fill="#6b7684">팁</text>
 </svg>`; }
 
-/* 불꽃 각 부분의 이름표 (배우기 전용 — 게임에서는 쓰지 않습니다) */
-function figFlameLabel(){ return `
-<svg class="fig" viewBox="0 0 400 150" width="360" role="img" aria-label="불꽃의 구성">
-  <rect x="6" y="61" width="46" height="18" rx="3" fill="#7d8794"/>
-  <rect x="44" y="64" width="18" height="12" rx="2" fill="#4a5560"/>
-  <path d="M62 40 Q124 30 174 70 Q124 110 62 100 Z" fill="#7f93e0" opacity=".45"/>
-  <path d="M62 51 Q97 45 120 70 Q97 95 62 89 Z" fill="#4f74d8" opacity=".75"/>
-  <path d="M62 59 Q78 56 88 70 Q78 84 62 81 Z" fill="#fff" stroke="#dfe6f2"/>
-  <line x1="80" y1="60" x2="96" y2="26" stroke="#6b7684"/>
-  <text x="72" y="20" font-size="12" fill="#1c2430">불꽃심(백심)</text>
-  <line x1="112" y1="62" x2="150" y2="34" stroke="#6b7684"/>
-  <text x="152" y="30" font-size="12" fill="#1c2430">속불꽃</text>
-  <line x1="164" y1="80" x2="206" y2="104" stroke="#6b7684"/>
-  <text x="208" y="108" font-size="12" fill="#1c2430">겉불꽃</text>
-  <text x="150" y="132" font-size="12" fill="#6b7684">백심 끝에서 2~3㎜ 앞이 용접하는 자리</text>
-</svg>`; }
-
-/* 산소·아세틸렌 용기 */
-function figCylinders(){ return `
-<svg class="fig" viewBox="0 0 320 180" width="300" role="img" aria-label="산소와 아세틸렌 용기">
-  <rect x="34" y="42" width="60" height="118" rx="26" fill="#12a150" stroke="#0b7a3c"/>
-  <rect x="56" y="26" width="16" height="20" fill="#7d8794"/>
-  <text x="64" y="104" font-size="14" fill="#fff" text-anchor="middle" font-weight="bold">산소</text>
-  <text x="64" y="176" font-size="12" fill="#1c2430" text-anchor="middle">녹색 용기</text>
-  <rect x="226" y="42" width="60" height="118" rx="26" fill="#f5c542" stroke="#c79a12"/>
-  <rect x="248" y="26" width="16" height="20" fill="#7d8794"/>
-  <text x="256" y="98" font-size="13" fill="#1c2430" text-anchor="middle" font-weight="bold">아세</text>
-  <text x="256" y="114" font-size="13" fill="#1c2430" text-anchor="middle" font-weight="bold">틸렌</text>
-  <text x="256" y="176" font-size="12" fill="#1c2430" text-anchor="middle">노란 용기</text>
-  <path d="M94 92 Q150 92 150 116 H170" stroke="#12a150" stroke-width="5" fill="none"/>
-  <text x="128" y="86" font-size="11" fill="#12a150">녹색 호스</text>
-  <path d="M226 92 Q170 92 170 128 H150" stroke="#e5484d" stroke-width="5" fill="none"/>
-  <text x="196" y="86" font-size="11" fill="#e5484d">빨간 호스</text>
-  <rect x="140" y="108" width="44" height="26" rx="5" fill="#4a5560"/>
-  <text x="162" y="126" font-size="11" fill="#fff" text-anchor="middle">토치</text>
-</svg>`; }
-
 
 /* ── 1) 배우기 — 정답을 다 보여 주는 단계. 테스트보다 반드시 앞에 ── */
 const LEARN = [
@@ -349,7 +278,6 @@ const LEARN = [
   '「재료가 절약된다」는 장점, 「변형과 수축이 생긴다」는 단점입니다.</div>' },
 
 { unit:'1단원 용접 원리', t:'용접될 때 일어나는 일 — 용적·용융지·용입·용착', body:
-  figWeldTerms() +
   '<table class="t"><tr><th>용어</th><th>뜻</th></tr>' +
   '<tr><td>용적</td><td>용접봉이 녹아 모재로 옮겨 가는 쇳물 <b>방울</b></td></tr>' +
   '<tr><td>용융지</td><td>아크열로 모재가 녹아 쇳물이 <b>고인 곳</b></td></tr>' +
@@ -363,7 +291,6 @@ const LEARN = [
 { unit:'2단원 전기용접', t:'아크 용접의 회로', body:
   '용접봉 끝과 모재 사이에 <span class="kw">아크</span>를 일으켜, 그 열(약 5,000℃ 이상)로 ' +
   '모재와 용접봉을 함께 녹여 붙이는 방법입니다. 전류는 아래처럼 <b>한 바퀴 돌아 제자리로</b> 옵니다.' +
-  figCircuit() +
   '<div class="explain">용접기 → 홀더 케이블 → 홀더 → 용접봉 → 아크 → 모재 → 접지 케이블 → 용접기<br>' +
   '<b>케이블이 먼저, 홀더가 나중</b>입니다. 케이블이 홀더까지 전기를 날라다 주기 때문입니다.</div>' },
 
@@ -424,10 +351,6 @@ const LEARN = [
   '「슬래그가 급랭시킨다」는 설명은 정반대라 틀린 말입니다.</div>' },
 
 { unit:'2단원 전기용접', t:'용접 자세 네 가지', body:
-  '<div class="row" style="justify-content:center;gap:0">' + figPos('F') + figPos('H') + '</div>' +
-  '<div class="figcap">왼쪽 : 아래보기(F) &nbsp;·&nbsp; 오른쪽 : 수평(H)</div>' +
-  '<div class="row" style="justify-content:center;gap:0">' + figPos('V') + figPos('O') + '</div>' +
-  '<div class="figcap">왼쪽 : 수직(V) &nbsp;·&nbsp; 오른쪽 : 위보기(O)</div>' +
   '<table class="t"><tr><th class="c">기호</th><th>이름</th><th>어떤 자세인가</th></tr>' +
   '<tr><td class="c">F</td><td>아래보기</td><td>모재가 수평이고 위에서 내려다보며 한다 (flat)</td></tr>' +
   '<tr><td class="c">H</td><td>수평</td><td>수직면에서 용접선이 <b>옆으로</b> 간다 (horizontal)</td></tr>' +
@@ -465,7 +388,6 @@ const LEARN = [
 
 /* ═══ 3단원 가스용접 ═══ */
 { unit:'3단원 가스용접', t:'산소와 아세틸렌', body:
-  figCylinders() +
   '<table class="t"><tr><th></th><th class="c">산소</th><th class="c">아세틸렌</th></tr>' +
   '<tr><td>성질</td><td class="c">조연성 가스<br>(스스로 타지 않고 타는 것을 돕는다)</td>' +
   '<td class="c">가연성 가스<br>(스스로 잘 탄다)</td></tr>' +
@@ -487,7 +409,6 @@ const LEARN = [
   '아세틸렌 쪽이 훨씬 낮다는 점을 기억하세요.</div>' },
 
 { unit:'3단원 가스용접', t:'불꽃의 구성', body:
-  figFlameLabel() +
   '<table class="t"><tr><th>부분</th><th>성질</th></tr>' +
   '<tr><td>불꽃심(백심)</td><td>가장 밝고 흰 부분</td></tr>' +
   '<tr><td>속불꽃</td><td>온도가 가장 높으며 <b>환원성</b>을 띤다</td></tr>' +
@@ -836,7 +757,7 @@ let lastResult = null;    // 제출용 결과
    board-pro.js 는 공용이라 이 저장소로 복사하지 않고 고치지도 않는다.
    배우기 카드는 그대로 있다 — 이것은 별도의 한 벌이다. */
 function openSlides(){
-  const ALL = window.LESSON || [], FIG = window.FIGS || {};
+  const ALL = window.LESSON || [], SF = window.SLIDEFIG || {};
   if(!ALL.length || typeof BoardPro === 'undefined'){
     alert('수업 슬라이드를 불러오지 못했습니다. 인터넷 연결을 확인해 주세요.');
     return;
@@ -861,7 +782,7 @@ function openSlides(){
     sub:'요점 → <b>발문</b> → 퀴즈 → 정답을 하나씩 엽니다. 화면 어디든 바로 판서됩니다.<br>'+
         '요점 속 <b>파란 빈칸</b>은 눌러야 답이 보입니다.',
     menu: MENU,
-    fig: s => (s.fig && FIG[s.fig]) ? FIG[s.fig]() : ''
+    fig: s => (s.fig && SF[s.fig]) ? SF[s.fig]() : ''
   });
 }
 
@@ -888,6 +809,12 @@ function render(view){
 }
 
 /* ── 배우기 ── */
+/* figs.js 의 cards 에 이 카드 제목이 있으면 카드 맨 위에 그림을 붙인다(누르면 크게) */
+function learnFigs(title){
+  if(!window.FIG || !window.FIGS) return '';
+  const keys = Object.keys(FIGS).filter(k=>(FIGS[k].cards||[]).indexOf(title) >= 0);
+  return keys.length ? '<div class="lfig">' + FIG.gallery(keys) + '</div>' : '';
+}
 function renderLearn(v){
   let unit = '';
   LEARN.forEach(c=>{
@@ -898,7 +825,7 @@ function renderLearn(v){
     v.appendChild(el(`<div class="card">
       <span class="pill">${esc(c.unit||'')}</span>
       <h3>${esc(c.t)}</h3>
-      <div class="body">${c.body}</div>
+      <div class="body">${learnFigs(c.t)}${c.body}</div>
     </div>`));
   });
   v.appendChild(el(`<div class="card row">
